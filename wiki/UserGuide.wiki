@@ -2,7 +2,7 @@
 This page will show you how to use _My Favorite Things_ . We will login, create a new release and eventually print out the download vouchers. For all this _My Favorite Things_ needs to be installed which is described under [Installation].
 
 == Logging In ==
-If you have 
+If you have finished the [Installation] just replace the `install.cgi` part of the installer web address with `Releases.cgi`
 
-You login to the admin menu via the address
-http://your-domain.name/cgi-bin/MyFavoriteThings/cgi/Releases.cgi
+So you login to the admin menu via the address
+`http://your-domain.name/cgi-bin/MyFavoriteThings/cgi/Releases.cgi`
