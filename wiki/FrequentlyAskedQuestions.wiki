@@ -1,6 +1,6 @@
 *Why is it called _My Favorite Things_?*
 
-Well there are two reasons. Being a passionate vinyl lover my records are quite often my favorite things. Secondly, when I was writting the very first version of the program (well, this was acutally a different single script program serving the same purpose) I was listening the "My Favorite Things" by John Coltrane.
+Well there are two reasons. Being a passionate vinyl lover my records are quite often my favorite things. Secondly, when I was writting the very first version of the program (well, this was acutally a different single script program serving the same purpose) I was listening to "My Favorite Things" by John Coltrane.
 
 *Can I contribute?*
 
