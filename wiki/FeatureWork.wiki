@@ -7,5 +7,5 @@ This page contains in mixed order some possible features of a feature release.
   * Currently you have to login via "Releases.cgi" - this is not really intuitive. There should be a central "Login" page
   * Add a Progress Bar for uploading the music ZIP file
   * Inside the "Add new release" area, defining the central download page (= public URL printed on the voucher) the page contains fixed examples of the possible URL. This should be dynamic examples, containing the real http://my-domain... bits
-   * Change the text of the vouchers
-   * Customize the public download page with own content
+  * Change the text of the vouchers
+  * Customize the public download page with own content
