@@ -1,6 +1,6 @@
 = Feature Work =
 
-This page contains in mixed order some possible features of a feature release.
+This page contains in mixed order some possible features of a future release.
 
   * Give an estimation of the download volume (how many GB will this release consum? ) and monitor a pre-defined maximum dowload volume per day. If exceeded display a "sorry, please try tomorrow" message.
   * Add some nice stats pages to graphically present when and where downloads took place. Maybe mashup with google maps? 
