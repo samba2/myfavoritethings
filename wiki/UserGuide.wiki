@@ -6,3 +6,17 @@ If you have finished the [Installation] just replace the `install.cgi` part of t
 
 So you login to the admin menu via the address
 `http://your-domain.name/cgi-bin/MyFavoriteThings/cgi/Releases.cgi`
+
+After entering the admin password you have chosen during install, you get presented the main admin screen. Lets add a new release (= download code project). 
+
+== Creating a new release ==
+Generally creating a new release consists out of the following steps:
+  * Entering release title and release code
+  * Specify the amount of download codes needed
+  * Define the public download web address of your release
+  * Uploading the Zip file containing the download codes
+
+At this stage the release is created. It is now possible to print out the download vouchers which _My Favorite Things_ sends to you as PDF file via your web browser. 
+
+
+Click on _Add new Release_
