@@ -6,6 +6,7 @@ _My Favorite Things_ is running as good old Common Gateway Interface (CGI) appli
 
 _My Favorite Things_ is written in Perl. It requires an existing Perl 5 installation on the web server. This should hopefully be the case on almost every webserver. So you don't have to worry about it. If you are facing problems it is a good idea to ask your provider if "Perl" is supported and if the perl binary file is located under `/usr/bin/perl`. But as I said, this is pretty much standard so you should be safe here.
 
+== Install ==
 The whole `MyFavoriteThings` folder needs to be copied to the CGI area of your web site. In almost all cases this is inside the directory `cgi-bin` of your web server. 
 If you don't find such a directory in your web space, try to create `cgi-bin` and copy `MyFavoriteThings` inside it.
 
