@@ -17,7 +17,7 @@ Inside the `MyFavoriteThings` folder is a directory called `cgi`. Go inside and 
   * install.cgi
   * Releases.cgi
   * Wizard.cgi
-  * DownloadFile.cgi
+  * !DownloadFile.cgi
   * Login.cgi
 
 Now add the _execute_ permission to all those cgi files. This is done by your FTP/ SFTP client program. If you don't know how to change this permission consult the help function of your FTP/ SFTP client. Apply `execute` to all three user groups: `user`, `group` and `others`
