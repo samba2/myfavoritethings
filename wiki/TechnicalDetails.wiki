@@ -85,11 +85,3 @@ developing I read the book "Clean Code" by Robert C. Martin. I tried to follow h
 self explaining names for the methods, let methods do only one thing (well, I found this quite hard) and
 cluster methods of one type in an own package/ class file. 
 Compared to standard, quick perl you might find the code blown up - I like it though ;-)
-
-== Rate Limiter ==
-_My Favorite Things_ has a built in rate limiter. Currently accessing a page more then 20 times in a minute
-will lock you out for a short while. This was included to prevent people trying to break in by simply
-trying out all possible variants of your admin password (brute force) FOR HOW LONG?????
-
-The rate limiter also applies to the user download page so finding a valid download code by simply trying out 
-is prevented as well.
