@@ -38,3 +38,18 @@ Good luck ;-)
 If your perl interpreter is not at `/usr/bin/perl` but somewhere else you have to alter the first line of all the cgi files inside the `cgi` directory.
 If you are trying to install on Windows (is someone really doing that?!) change for all files
 `#!/usr/bin/perl -w` to the path of your perl binary on the Windows system like `#!C:/Perl/bin/perl.exe -w`
+
+== Understanding the Forwarder ==
+I admit I have been a little bit inconsistent while talking about the "central download path" or the "forwarder URL". It is all the same.
+The actual user download is done by `DownloadFile.cgi` + some (quite long) parameters. So you end up with something like
+`http://your-domain/cgi-bin/MyFavoriteThings/cgi/DownloadFile.cgi?r=DFnmd313fbs7nd463` which is not nice.
+
+To overcome that a HTML forwarder (technically speaking a redirect) is created with a nicer URL which then sends your browser to the `DownloadFile.cgi` URL above.
+In our example the nice URL could look like:
+`http://your-domain/downloads/MyRelease`
+
+The forwarder is placed inside the normal web root directory. For each release a new directory is created. Inside
+the directory a `index.html` is written which contains the forward to the long URL above. 
+
+If you want to understand this concept better just create a release and have a look inside the forwarder directory.
+You will find the index.html file - open it and you will see the redirect to the actual CGI program.
