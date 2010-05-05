@@ -33,3 +33,8 @@ If `cgi-bin` is located directly on the top level of your web server then the UR
 If your lucky the "My Favorite Things Installer" page is presented to you. From here just follow the instructions.
 
 Good luck ;-)
+
+== Perl is located somewhere else/ Running on Windows ==
+If your perl interpreter is not at `/usr/bin/perl` but somewhere else you have to alter the first line of all the cgi files inside the `cgi` directory.
+If you are trying to install on Windows (is someone really doing that?!) change for all files
+`#!/usr/bin/perl -w` to the path of your perl binary on the Windows system like `#!C:/Perl/bin/perl.exe -w`
