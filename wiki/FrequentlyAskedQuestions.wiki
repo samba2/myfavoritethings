@@ -6,6 +6,10 @@ I gave my best to write a stable software. However, _My Favorite Things_ comes w
 
 Sure you can. You can also make your own version of the software *as long as this new software stays open source as well*. See the General GNU Public License Version 3 under which _My Favorite Things_ is being released for details.
 
+* How do I get in contact with you?*
+
+Email me: maiktoepfer@googlemail.com
+
 *For how long is a download code valid after it expires?*
 
 When a custumer enters the download code this code stays active for _one hour_. After that time the code expires.
