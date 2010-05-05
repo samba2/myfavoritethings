@@ -2,9 +2,13 @@
 
 I gave my best to write a stable software. However, _My Favorite Things_ comes with no warranty at all. The software is free, you can use it, you can alter it, you can check the code yourself. Please let me know if you have found a bug.
 
+*Can I use _My Favorite Things_ for commercial purposes?*
+
+Sure you can. You can also make your own version of the software *as long as this new software stays open source as well*. See the General GNU Public License Version 3 under which _My Favorite Things_ is being released for details.
+
 *For how long is a download code valid after it expires?*
 
-When a custumer enters the download code this code stays active for `one hour`. After that time the code expires.
+When a custumer enters the download code this code stays active for _one hour_. After that time the code expires.
 
 *How can I change the text of the download voucher?*
 
