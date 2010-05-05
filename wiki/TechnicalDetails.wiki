@@ -78,12 +78,6 @@ The following single application exists:
   * Login.cgi - If Releases.cgi or Wizard.cgi find out that there is no authenticated session, the browser is forwarded to this program. This let the admin enter the password and redirects back to the origin page.
   * DownloadFile.cgi - the CGI program the end user entering its code is forwarded to. If called with the correct parameters it provides the "Please enter your code" screen and the download file streaming.
 
-== Perl is located somewhere else/ Running on Windows ==
-
-If your perl interpreter is not at `/usr/bin/perl` but somewhere else you have to alter the first line of all the cgi files inside the `cgi` directory.
-If you are trying to install on Windows (is someone really doing that?!) change for all files
-`#!/usr/bin/perl -w` to the path of your perl binary on the Windows system like `#!C:/Perl/bin/perl.exe -w`
-
 == Code Style ==
 
 The perl code you find in _My Favorite Things_ is hopefully far away from the famous perl onliners. While
