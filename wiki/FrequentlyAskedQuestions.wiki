@@ -1,6 +1,26 @@
-*Why is it called _My Favorite Things_?*
+*Is there any warranty if something goes wrong?*
 
-Well there are two reasons. Being a passionate vinyl lover my records are quite often my favorite things. Secondly, when I was writting the very first version of the program (well, this was acutally a different single script program serving the same purpose) I was listening to "My Favorite Things" by John Coltrane.
+I gave my best to write a stable software. However, _My Favorite Things_ comes with no warranty at all. The software is free, you can use it, you can alter it, you can check the code yourself. Please let me know if you have found a bug.
+
+*For how long is a download code valid after it expires?*
+
+When a custumer enters the download code this code stays active for `one hour`. After that time the code expires.
+
+*How can I change the text of the download voucher?*
+
+In a future release there will be a possiblity directly inside _My Favorite Things_. In the mean time you can do the following step. Attention, this should be only done if your a experienced with copying and editing web server/ unix data
+  * login to your webspace and change to the `MyFavoriteThings/data` directory
+  * copy the file "config.csv" to your computer, if you are using FTP make sure you are using *Binary* mode. This is important otherwise config.csv is getting currupted
+  * on your computer copy "config.csv" to "config_backup.csv". This is just in case something goes wrong.
+  * open config.csv with a editor which is capable of handling Unix files. I recommend GVIM
+  * look for a line starting with _GLOBAL,labelHeader,_ 
+  * behind the last comma you will find the text which is printed by default onto your vouchers, change the text to your needs but don't use any special characters and make sure that you close the line with a `"`
+  * copy "config.csv back to the `MyFavoriteThings/data` directory, overwrite the old version
+  * Now the vouchers should contains your specific text.
+
+*Can I change the name of the !MyFavoriteThings directory?*
+
+Yes, you can but leave the structure underneath untuched.
 
 *Can I contribute?*
 
@@ -19,6 +39,10 @@ Please have a look if it is already on the FutureWork page. If not just drop me 
 No, I don't think so. _My Favorite Things_ was developed having small DIY labels in mind which most of the time invest a lot of free time providing music lovers like me with fantastic undiscovered material. 
 Looking at my record collection over the years I have bought quite a lot of music releases by these small labels. This is my kind of appreciation of their work.
 But I admit there is also a very practical reason for spending 3 month free time for the first release of _My Favorite Things_: It still p...es me off buying records without download option having to do all the Audacity recording/ MP3 conversion my self. I hope _My Favorite Things_ will change this a little bit.
+
+*Why is it called _My Favorite Things_?*
+
+Well there are two reasons. Being a passionate vinyl lover my records are my (almost) favorite things. Secondly, when I was writting the very first version of the program (well, this was acutally a different single script program serving the same purpose) I was listening to "My Favorite Things" by John Coltrane.
 
 *So your a music lover as well, what kind of?*
 
