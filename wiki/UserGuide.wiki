@@ -15,8 +15,7 @@ Generally creating a new release consists out of the following steps:
   * Specify the amount of download codes needed
   * Define the public download web address of your release
   * Uploading the Zip file containing the download codes
-
-Creating a new release is assisted by some extra information for each step, written in _italic_ at the buttom of each page.
+Click on "Add New Release". From their on you will be guided by the software. There are additional explainations for each step, written in _italic_ at the buttom of each page.
 
 == Printing PDF ==
 If you have successfully created a new release, it is now possible to print out the download vouchers which _My Favorite Things_ sends to you as PDF file via your web browser. To do so, click on "Manage Releases", select the release you are interessted in and then click on "Export Download-Vouchers". Your browser should inform you that it is receiving a PDF file. Download that file and open it. It contains auto-formated two-collumn A4 pages with your download vouchers. See ScreenShots for an example.
@@ -32,4 +31,3 @@ Just open your release and click "Code Status". If the code is "used" _My Favori
 
 == Deleting a release ==
 If you open a release inside "Manage Releases" there is also a link to delete this release. This will remove ALL traces of this record inside _My Favorite Things_. There is no download possibility left afterwards! Please think twice before removing!
-
