@@ -24,11 +24,11 @@ In a future release there will be a possiblity directly inside _My Favorite Thin
   * look for a line starting with _GLOBAL,labelHeader,_ 
   * behind the last comma you will find the text which is printed by default onto your vouchers, change the text to your needs but don't use any special characters and make sure that you close the line with a `"`
   * copy "config.csv back to the `MyFavoriteThings/data` directory, overwrite the old version
-  * Now the vouchers should contains your specific text.
+  * Now the vouchers should contain your specific text.
 
 *Can I change the name of the !MyFavoriteThings directory?*
 
-Yes, you can but leave the structure underneath untuched.
+Yes, you can but leave the structure underneath untouched.
 
 *Can I contribute?*
 
