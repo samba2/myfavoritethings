@@ -1,3 +1,4 @@
   * myfavoritethings-0_5a.zip
     * initial release 
   * myfavoritethings-0_5b.zip
+    * added missing library Class::Accessor::Fast, needed by RateLimit.pm
