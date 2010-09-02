@@ -280,8 +280,8 @@ sub getUnescapedValue {
 sub setupSession {
 	my $self = shift;
 
-	# expires after 10 min inactivity!
-	my $sessionExpire = "10m";
+	# expires after 120 min inactivity!
+	my $sessionExpire = "120m";
 
 	# change default session dir
 	my $sessionHome = $self->getSessionDir();
