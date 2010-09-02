@@ -1,0 +1,67 @@
+
+	<script type="text/javascript">
+
+	var hash = {
+ 	 '.zip' : 1,
+ 	 '.ZIP' : 1,
+	};
+
+	function check_extension(filename,submitId) {
+  	    var re = /\..+$/;
+    	var ext = filename.match(re);
+      	var submitEl = document.getElementById(submitId);
+      	if (hash[ext]) {
+	        submitEl.disabled = false;
+        	return true;
+      	} else {
+	        alert("Invalid archive format, please select another file. (Archive must have a 'zip' extension)");
+        	submitEl.disabled = true;
+
+	        return false;
+      	}
+	}
+	
+	function check_extension2(filename,submitId) {
+  	    var re = /\..+$/;
+    	    var ext = filename.match(re);
+      	    var submitEl = document.getElementById(submitId);
+
+	   submitEl.disabled = false;
+           return true;
+	}
+
+        function showdiv() {
+            if (document.getElementById) { // DOM3 = IE5, NS6
+                document.getElementById('pleaseWait').style.display='block';
+            }  
+        }  
+	</script>
+
+<div id=wizardUploadZipFile>
+<form enctype='multipart/form-data' action=<TMPL_VAR NAME=SCRIPTNAME> method=post onsubmit="showdiv();">
+<p>
+Please select the ZIP file containing the packed MP3 files
+</p>
+<p>
+<input onchange='check_extension(this.value,"upload");' name="fileName" type="file" size="20" />
+
+<p class=highlight><TMPL_VAR NAME=ERRORMESSAGE></p>
+<input type="submit" id="upload" name="submitButton" disabled="disabled" value="Upload" />
+<input type="hidden" name="rm" value="wizardReleaseCreated">
+</form>
+</p>
+</div>
+<blockquote>
+<p>Please note: 
+<ul>
+	<li>The maximum upload file size is <TMPL_VAR NAME=MAXALLOWEDSIZE>.</li>
+	<li>While the upload is taking place, please wait until the next page is displayed. A progress bar comes with the next release.</li>
+</ul>
+</p>
+</blockquote>
+</div>
+
+<div id=pleaseWait style="width:400px; margin-left:auto; margin-right:auto; positon:relative; text-decoration: blink; display:none"> 
+<h2>Uploading, please wait...</h2>
+</div>
+
