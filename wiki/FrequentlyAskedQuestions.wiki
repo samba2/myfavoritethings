@@ -33,7 +33,7 @@ Yes, you can but leave the structure underneath untouched.
 *Can I replace the uploaded zip file later on?*
 
 If you want to create a new project to already create your vouchers but you don't have the music available so far you can use a trick: Simply pack a fake zip file with some content. It is important that this zip file has already the correct name. Than create your new project and upload the fake zip file. 
-Once you've got the music available pack a new zip file containing the music and name it exactly like the fake zip file. Connect then to your web server and look inside the "My Favorite Things" directory. There should be a subdirectory called "upload" which contains your previously uploaded fake zip file. Now simple overwrite this file with your new zip file.
+Once you've got the music available pack a new zip file containing the music and name it exactly like the fake zip file. Connect then to your web server and look inside the "My Favorite Things" directory. There should be a subdirectory called "upload_files" which contains your previously uploaded fake zip file. Now simple overwrite this file with your new zip file.
 
 *Can I contribute?*
 
