@@ -8,6 +8,14 @@ use File::Path qw ( mkpath );
 use File::Basename;
 use File::Copy::Recursive qw ( dircopy );
 use CGI::Application::Plugin::Redirect;
+use Exception::Class('MyFav::Install::ChmodFailed',
+                     'MyFav::Install::UrlNotAccessible',
+                     'MyFav::Install::CssCopyFailed',
+                     'MyFav::Install::CssNotAccessible',
+                     'MyFav::Install::CantCreateForwarderPath',
+                     'MyFav::Install::NoAccessToForwarderUrl',
+                     'MyFav::Install::NoWriteInForwarderPath'
+                     );
 
 use base 'MyFav::Base';
 
@@ -120,28 +128,62 @@ sub runModeProcessInstall {
 		my $downloadCgiPath = $cgiHttpPath . "/DownloadFile.cgi";
 		my $loginCgiPath    = $cgiHttpPath . "/Login.cgi";
 		my $releasesCgiPath  = $cgiHttpPath . "/Releases.cgi";
+        my $cssSource = $self->getCssPath();
+
+
+        my $template = $self->load_tmpl("installerAbort.tmpl");
 
 		eval {
 
 			# copy css to www area + test accessiblity
-			dircopy( "../myfavCss", $cssPath ) or die $!;
-			$self->urlAccessible($cssUrl)
-			  or die "Can't access style sheet file under $cssUrl";
-
+			dircopy( $cssSource , $cssPath ) or MyFav::Install::CssCopyFailed->throw( error=>$! );
+			unless ($self->urlAccessible($cssUrl)) {
+			    MyFav::Install::CssNotAccessible->throw();
+			} 
+			
 			# create $forwarderPath, write a testfile inside, try to open it via
 			# a http call and delete test file afterwards
-			mkpath($forwarderPath) or die "Could not create $forwarderPath";
+			mkpath($forwarderPath) or MyFav::Install::CantCreateForwarderPath->throw( error=>$! );
+			;
 			$self->writeTestFile("$forwarderPath/test.txt");
 			$self->urlAccessible("$forwarderUrl/test.txt")
-			  or die "Can't access content under $forwarderUrl";
+			  or MyFav::Install::NoAccessToForwarderUrl->throw();
+			  
 			unlink "$forwarderPath/test.txt"
-			  or die "Can't delete under $forwarderUrl";
+			  or MyFav::Install::NoWriteInForwarderPath->throw();
+
+            # create .htaccess file to prevent listing of dirs inside $forwarderPath via browser
+            $self->writeHtaccessFile("$forwarderPath/.htaccess");	
 		};
 
-		if ($@) {
-			return "The installation has failed. Please correct the error and \
-			        repeat the install process. \
-			        Error: $@";
+        my $e = Exception::Class->caught();  
+        
+        if ( $e ) {
+            $template->param( "CSS_PATH" => $cssPath);
+            $template->param( "ERROR_DESC" => $e->error );
+            
+            if ( $e = Exception::Class->caught('MyFav::Install::CssCopyFailed') ) {
+                $template->param( "CSS_COPY_FAILED" => "1" );
+                $template->param( "CSS_SOURCE"  => $cssSource );
+            }
+            elsif ($e = Exception::Class->caught('MyFav::Install::CssNotAccessible')) {
+                $template->param( "CSS_NOT_ACCESSIBLE" => "1" );
+                $template->param( "CSS_URL" => $cssUrl );
+            }
+            elsif ($e = Exception::Class->caught('MyFav::Install::CantCreateForwarderPath')) {
+
+                $template->param( "CANT_CREATE_FORWARDER_PATH" => "1" );
+                $template->param( "FORWARDER_PATH" => $forwarderPath);
+            }
+            elsif ($e = Exception::Class->caught('MyFav::Install::NoAccessToForwarderUrl')) {
+                $template->param( "NO_ACCESS_TO_FORWARDER_URL" => "1" );  
+                $template->param( "FORWARDER_URL" => "$forwarderUrl/test.txt" );                              
+            } 
+            elsif ($e = Exception::Class->caught('MyFav::Install::NoWriteInForwarderPath')) {
+                $template->param( "NO_WRITE_IN_FORWARDER_PATH" => "1" );      
+                $template->param( "FORWARDER_TEST_FILE" => "$forwarderPath/test.txt" );          
+            }             
+            return $template->output;
 		}
 
 		my $configDb = $self->createConfigDbObject();
@@ -167,28 +209,39 @@ sub runModeProcessInstall {
 		
 		my $scriptFileName = $self->getScriptFileName();
 		
-		
+        # needs to be loaded before exception testing
+        # otherwise exception handling is getting out of trap
+        $template = $self->load_tmpl("installerSuccessWithError.tmpl");
+
 		eval {
 			# prevent re-executing script after successfull setup.
-			chmod 0400, $scriptFileName or die "I could not remove the execution rights of the installer script. \
-			Please take away the execution rights of $scriptFileName \
-			or delete the file completely. Otherwise everyone is able to run the installer via the web again which \
-			would delete most of your data.";
+			chmod 0400, $scriptFileName or MyFav::Install::ChmodFailed->throw();
 		
 			# check for directory listings
-			if ($self->urlAccessible("$forwarderUrl/")) {
-				die "Please don't ignore this error, this is serious!! The content of $forwarderUrl is listable by everyone via the web. 
-				Since this directory will contain the links to your downloads you MUST protect it. \
-				If you are running on Apache try putting the file .htaccess inside $forwarderPath \
-				with this content: Options -Indexes\n";
-			};
+            if ($self->urlAccessible("$forwarderUrl/")) { 
+            	MyFav::Install::UrlNotAccessible->throw() 
+            };
+            
 		};
-		
-		if ($@) {
-			return "The installation completed successfully. However this error occured: $@ \
-			        When you have fixed this error you can login here: $releasesCgiPath"
+
+        $e = Exception::Class->caught();	
+        
+        if ( $e ) {
+            if ( $e = Exception::Class->caught('MyFav::Install::UrlNotAccessible') ) {
+                $template->param( "FORWARD_DIR_ACCESSIBLE" => "1" );
+                $template->param( "FORWARDERURL" => $forwarderUrl );
+                $template->param( "FORWARDERPATH_HTACCESS" => "$forwarderPath/.htaccess" );  
+            }
+            elsif ( $e = Exception::Class->caught('MyFav::Install::ChmodFailed')) {
+               $template->param( "CHMOD_FAILED" => "1" );
+               $template->param( "SCRIPTFILENAME" => $scriptFileName );
+            }
+            $template->param( "RELEASECGIURL" => $releasesCgiPath );
+            return $template->output;
 		}
-		return $self->redirect("$releasesCgiPath");
+		else {
+		    return $self->redirect("$releasesCgiPath");	
+		} 
 	}
 }
 
@@ -228,6 +281,18 @@ sub writeTestFile {
 	print FH " ";
 	close(FH);
 }
+
+sub writeHtaccessFile {
+	my $self         = shift;
+	my $htaccessFilePath = shift;
+
+	open( FH, ">$htaccessFilePath" )
+	  or die
+"Can't write htaccess file $htaccessFilePath. Are the directory permissions set correctly?";
+	print FH "Options -Indexes";
+	close(FH);
+}
+
 
 sub getNewPassword {
 	my $self = shift;

@@ -63,7 +63,7 @@ sub installTest {
 		"forward dir exists"
 	);
 	$mech->content_contains("The central web directory");
-	system("rmdir $documentRoot/$forwardDir");
+	system("rm -rf $documentRoot/$forwardDirTopLevel");
 
 	system("mkdir -p $documentRoot/$cssDir");
 	$mech->submit_form_ok(
@@ -79,7 +79,45 @@ sub installTest {
 	);
 	$mech->content_contains("The style sheet directory");
 	system("rmdir $documentRoot/$cssDir");
+
+    system("chmod 0500 $documentRoot");
+    $mech->submit_form_ok(
+        {
+            fields => {
+                newPassword1 => $currentPw,
+                newPassword2 => $currentPw,
+                forwarderDir => "$forwardDir",
+                cssDir       => "$cssDir"
+            }
+        },
+        "no css copy exception"
+    );
+    $mech->content_contains("Couldn't copy the css-files");
+
+    &bootstrapTestEnvironment;
+    $mech->get_ok("$cgiBinUrl/install.cgi");
+
 	
+    system("chown root $cgiPath/install.cgi");
+    system("chmod a+rx $cgiPath/install.cgi");
+
+    $mech->submit_form_ok(
+        {
+            fields => {
+                newPassword1 => $currentPw,
+                newPassword2 => $currentPw,
+                forwarderDir => "$forwardDir",
+                cssDir       => "$cssDir"
+            }
+        },
+        "no chmod of install.cgi after install exception"
+    );
+    $mech->content_contains("I could not remove the execution rights");
+
+
+    &bootstrapTestEnvironment;
+    $mech->get_ok("$cgiBinUrl/install.cgi");
+
 	$mech->submit_form_ok(
 		{
 			fields => {
@@ -91,6 +129,7 @@ sub installTest {
 		},
 		"everything fine"
 	);
+
 	$mech->content_contains("Please enter your login password");
 }
 

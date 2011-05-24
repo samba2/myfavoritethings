@@ -24,6 +24,7 @@ use CGI::Application::Plugin::RateLimit;
 # constants
 my $dataBaseDir = "../data";
 my $templatePath = '../html';
+my $cssPath = '../myfavCss';
 my $fileDir = "../upload_files";
 my $sessionDir = "../sessions";
 my $releaseDbPrefix = 'codes_for_';  # prefix for releaseDb csv files, prevents non-alphanum. start of file
@@ -451,6 +452,10 @@ sub getTemplatePath {
 	return $templatePath;
 }
 
+sub getCssPath {
+    return $cssPath;
+}
+
 sub getFileDir {
 	return $fileDir;
 }
@@ -462,5 +467,6 @@ sub getSessionDir {
 sub getReleaseDbPrefix {
 	return $releaseDbPrefix;
 }
+
 
 1;

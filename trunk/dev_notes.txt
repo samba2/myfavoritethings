@@ -26,4 +26,4 @@ the following SQL access methods where changed:
 record_hit_sth, check_violation_sth, revoke_hit_sth
 changed "$dbh->quote_identifier($self->table)" to "$self->table" 
 
-checkin test
+checkin tes
