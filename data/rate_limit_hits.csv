@@ -1,0 +1,8 @@
+user_id,action,timestamp
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadWelcomeScreen,1306249990
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadStartDownload,1306249990
+127.0.0.1,MyFav::SubApps::DownloadFile::streamFile,1306249991
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadWelcomeScreen,1306249991
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadStartDownload,1306249991
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadWelcomeScreen,1306249992
+127.0.0.1,MyFav::SubApps::DownloadFile::downloadStartDownload,1306249992
