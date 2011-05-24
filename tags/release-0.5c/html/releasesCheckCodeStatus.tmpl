@@ -1,0 +1,14 @@
+<div id=checkCodeStatus>
+
+<p>
+<form action=<TMPL_VAR NAME=SCRIPTNAME> method=post>
+Please enter the code you want to check <input type="text" size=10 maxlength=20 name="downloadCode">
+<input type="submit" value="Check">
+</p>
+<p class=highlight><TMPL_VAR NAME=ERRORMESSAGE></p>
+<p>
+<input type="hidden" name="rm" value="processCodeStatus">
+<input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>">
+</form>
+</p>
+</div>
