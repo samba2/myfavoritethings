@@ -10,3 +10,5 @@ This page contains in mixed order some possible features of a future release.
   * Let admin ahange the text of the vouchers
   * Customize the public download page with own content
   * support also Letter format for PDF files
+  * add expiry date (e.g. download expires after 1 year)
+  * archive creater (upload single mp3 files, check id3tags for title nr, image, album name... and pack everything to zip on the server side)
