@@ -9,7 +9,7 @@ use MyFav::DB::TempDB;
 use MyFav::DB::ConfigDB;
 use Date::Format;
 
-use Test::More tests => 252;
+use Test::More tests => 343;
 use Test::WWW::Mechanize;
 use WWW::Mechanize::Link;
 
@@ -84,4 +84,9 @@ sub bootstrapTestEnvironment {
     # adjust chmod for install.cgi
     system("chown www-data $cgiPath/install.cgi");
     chmod 0544, "$cgiPath/install.cgi";
+   
+    # web server owner needs to read/ write here
+    system("chown www-data $csvPath");
+    system("chown www-data $sessionDir");
+    system("chown www-data $uploadPath");
 }
