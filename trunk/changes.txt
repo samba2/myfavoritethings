@@ -1,0 +1,7 @@
+-new js folder
+-new release status property, old config files get automatically status "ready"
+- new jquery-ui css inside myfavCss
+
+
+muessen javascripts an download-page geschickt werden?
+sessions dir leert sich nicht?

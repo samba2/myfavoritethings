@@ -3,10 +3,15 @@
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <title><TMPL_VAR NAME=VERSIONID></title>
-<link href="<TMPL_VAR NAME=CSSPATH>" rel="stylesheet" type="text/css" />
+<link href="<TMPL_VAR NAME=WEB_LIB_PATH>/css/yaml_layout/my_layout.css" rel="stylesheet" type="text/css" />
+<link href="<TMPL_VAR NAME=WEB_LIB_PATH>/css/myFav-jquery-theme/jquery-ui-1.8.13.custom.css" rel="stylesheet" type="text/css" />  
 </head>
 
 <body>
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/jquery-1.6.1.min.js" type="text/javascript"></script>
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/myFavScripts.js" type="text/javascript"></script>
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/jquery-ui-1.8.13.custom.min.js" type="text/javascript"></script>
+  
   <div class="page_margins">
     <div class="page">
 <TMPL_IF NAME=DISPLAYHEADER>      

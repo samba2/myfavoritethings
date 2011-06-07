@@ -6,21 +6,16 @@
 The installation has failed. The following error occured:  
 <p><span style="color:red">
 
-<TMPL_IF NAME=CSS_COPY_FAILED>
-Couldn't copy the css-files from <TMPL_VAR NAME=CSS_SOURCE> to <TMPL_VAR NAME=CSS_PATH>. <br>
-</TMPL_IF>
-
-<TMPL_IF NAME=CSS_NOT_ACCESSIBLE>
-I have copied the css-data to <TMPL_VAR NAME=CSS_PATH>. However, I can't access the stylesheet under
-<a href="<TMPL_VAR NAME=CSS_URL>" target=_blank"><TMPL_VAR NAME=CSS_URL></a>. 
+<TMPL_IF NAME=WEB_LIB_COPY_FAILED>
+Couldn't copy the web library-files from <TMPL_VAR NAME=WEB_LIB_SOURCE> to <TMPL_VAR NAME=WEB_LIB_PATH>. <br>
 </TMPL_IF>
 
 <TMPL_IF NAME=CANT_CREATE_FORWARDER_PATH>
 Can't create the forwarder directory <TMPL_VAR NAME=FORWARDER_PATH>.<br>
 </TMPL_IF>
 
-<TMPL_IF NAME=NO_ACCESS_TO_FORWARDER_URL>
-I have created the file test.txt under <a href="<TMPL_VAR NAME=FORWARDER_URL>" target=_blank><TMPL_VAR NAME=FORWARDER_URL></a>.<br> 
+<TMPL_IF NAME=NO_WEB_ACCHESS>
+I have created the file test.txt under <a href="<TMPL_VAR NAME=TEST_URL>" target=_blank><TMPL_VAR NAME=TEST_URL></a>.<br> 
 However, I can't access it.
 </TMPL_IF>
 
