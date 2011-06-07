@@ -13,6 +13,7 @@ use Test::More tests => 252;
 use Test::WWW::Mechanize;
 use WWW::Mechanize::Link;
 
+require("Login.t");
 require("Wizard.t");
 require("Releases.t");
 require("DownloadFile.t");
@@ -27,7 +28,7 @@ our $cgiPath         = "../cgi/";
 our $documentRoot    = '/var/www';
 our $forwardDir      = 'DigitalDownload/promo';
 our ($forwardDirTopLevel) = $forwardDir =~ m/\A(.+)\//;
-our $cssDir          = 'myfavCss';
+our $webLibDir       = 'myfavLibs';
 our $currentPw       = 'a-zA-Z0-9_-.!"$%&';
 
 our $randomReleaseId = int( rand(10000) );
@@ -41,21 +42,23 @@ print "ok -- Start install procedure -- \n";
 # run test in Install.t
 &installTest();
 
-print "ok -- Testing Login.pm and Wizard (Starting the session) -- \n";
+print "ok -- Testing Login.pm -- \n";
+&testLogin();
 
-# run tests in Wizard.t
-&testWizardAndLogin();
-
+## run tests in Wizard.t
+print "ok -- Testing Wizard.pm -- \n";
+&testWizard();
+#
 print "ok -- Testing Downloadfile.pm -- \n";
-
-# tests inside DownloadFile.t
+#
+## tests inside DownloadFile.t
 &testDownloadFile("myfavTestId");
-
-# run test in releases.t with release id "myfavTestID" and change pw to "newpassword"
-print "ok -- Testing Releases.pm --\n";
+#
+## run test in releases.t with release id "myfavTestID" and change pw to "newpassword"
+#print "ok -- Testing Releases.pm --\n";
 &testReleases( "myfavTestId", "newpassword" );
 
-
+    
 sub bootstrapTestEnvironment {
     
     # grant rwx to docRoot
@@ -75,8 +78,8 @@ sub bootstrapTestEnvironment {
     # delete old forwarder dirs
     system("rm -rf $documentRoot/$forwardDir/");
 
-    # delete old css dir
-    system("rm -rf $documentRoot/$cssDir");
+    # delete old weblib dir
+    system("rm -rf $documentRoot/$webLibDir");
 
     # adjust chmod for install.cgi
     system("chown www-data $cgiPath/install.cgi");

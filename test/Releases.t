@@ -10,9 +10,18 @@ sub testReleases {
 		"dataBaseDir"  => $baseClass->getDataBaseDir()
 	);
 	
-	# just send an empty request, should give back empty status page
+	# just send an empty request, should give login page
 	$mech->get_ok("$cgiBinUrl/Releases.cgi");
-	$mech->content_contains("Select a release");
+    $mech->content_contains("Please enter your login password");
+	
+	 # login
+    $mech->submit_form_ok( { fields => { loginPassword => "$currentPw" } },
+        "login to test Releases.pm" );
+	
+	
+	$mech->has_tag( option=>'Select a release', 'Release selection menu is present');
+    $mech->has_tag( option=>'myfavTestName', 'myfavTestName is a selection option');
+    
 	$mech->content_unlike( qr/Release Name/,
 		"no release details are displayed" );
 
@@ -146,8 +155,8 @@ sub testReleases {
 		{
 			fields => {
 				oldPassword  => "$currentPw",
-				newPassword1 => 'ßpasswd',
-				newPassword2 => 'ßpasswd'
+				newPassword1 => '#passwd',
+				newPassword2 => '#passwd'
 			}
 		},
 		"inval. chars"

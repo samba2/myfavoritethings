@@ -65,20 +65,20 @@ sub installTest {
 	$mech->content_contains("The central web directory");
 	system("rm -rf $documentRoot/$forwardDirTopLevel");
 
-	system("mkdir -p $documentRoot/$cssDir");
+	system("mkdir -p $documentRoot/$webLibDir");
 	$mech->submit_form_ok(
 		{
 			fields => {
 				newPassword1 => $currentPw,
 				newPassword2 => $currentPw,
 				forwarderDir => "$forwardDir",
-				cssDir       => "$cssDir"
+				cssDir       => "$webLibDir"
 			}
 		},
-		"css dir exists"
+		"weblib dir exists"
 	);
-	$mech->content_contains("The style sheet directory");
-	system("rmdir $documentRoot/$cssDir");
+	$mech->content_contains("The directory '$webLibDir' is already existing");
+	system("rmdir $documentRoot/$webLibDir");
 
     system("chmod 0500 $documentRoot");
     $mech->submit_form_ok(
@@ -87,12 +87,12 @@ sub installTest {
                 newPassword1 => $currentPw,
                 newPassword2 => $currentPw,
                 forwarderDir => "$forwardDir",
-                cssDir       => "$cssDir"
+                cssDir       => "$webLibDir"
             }
         },
-        "no css copy exception"
+        "no web lib copy exception"
     );
-    $mech->content_contains("Couldn't copy the css-files");
+    $mech->content_contains("Couldn't copy the web library-files");
 
     &bootstrapTestEnvironment;
     $mech->get_ok("$cgiBinUrl/install.cgi");
@@ -107,7 +107,7 @@ sub installTest {
                 newPassword1 => $currentPw,
                 newPassword2 => $currentPw,
                 forwarderDir => "$forwardDir",
-                cssDir       => "$cssDir"
+                cssDir       => "$webLibDir"
             }
         },
         "no chmod of install.cgi after install exception"
@@ -124,7 +124,7 @@ sub installTest {
 				newPassword1 => $currentPw,
 				newPassword2 => $currentPw,
 				forwarderDir => "$forwardDir",
-				cssDir       => "$cssDir"
+				cssDir       => "$webLibDir"
 			}
 		},
 		"everything fine"

@@ -1,61 +1,113 @@
-	<script>
-	function fieldOff() {
-		document.getElementById('textField').value = "";
-		document.getElementById('textField').disabled = true;	
-	}
-		function fieldOn() {
-		document.getElementById('textField').disabled = false;	
-	}
-    </script>
-
 <div id=wizardForwarderDetails>
-<p>
-How do you want to setup the download URL?
-</p>
+    <p>
+        How do you want to setup the download URL?
+    </p>
 
-<form action=<TMPL_VAR NAME=SCRIPTNAME> method=post>
-<p>
-<table>
-	<tr>
-		<td><p><input type="radio" name="forwarder" value="randomString" onclick="fieldOff()" <TMPL_VAR NAME=RANDOMSTRINGCHECKED> /> 
-by 4 characters long random text</p></td>
-		<td><p class=dimmed>example: http://your-domain/downloads/QWER</p></td>
-	</tr>
-	<tr>
-		<td><p><input type="radio" name="forwarder" value="releaseName" onclick="fieldOff()" <TMPL_VAR NAME=RELEASENAMECHECKED> /> by release ID</p></td>
-		<td><p class=dimmed>The release ID which was choosen two steps before. Example: http://your-domain/downloads/myRelease12</p></td>
-	</tr>
-	<tr>
-		<td><p><input type="radio" name="forwarder" value="customString" id=customString onclick="fieldOn()" <TMPL_VAR NAME=CUSTOMSTRINGCHECKED> /> by custom name</p></td>
-		<td><p class=dimmed>A text of your choice. Example: http://your-domain/downloads/a-good-record</p></td>
-	</tr>
-	<tr colspan=2 ><td><input type=text id=textField name="customDir" value="<TMPL_VAR NAME=CUSTOMDIR>"</td></tr>
-
-</table>
-</p>
-
-<p class=highlight><TMPL_VAR NAME=ERRORMESSAGE></p>
-<p> 
-<input type="submit" value="Next">
-<input type="hidden" name="rm" value="wizardUploadFile">
-</p>
-</form>
+    <div class="subcolumns">
+        <div class="c25l">
+             <div class="subcl">
+                <form action=<TMPL_VAR NAME=SCRIPTNAME> method=post>
+                    <p>
+                        <table>
+                        	<tr>
+                        		<td><p><input type="radio" name="forwarder" id="randomString" value="randomString" " <TMPL_VAR NAME=RANDOMSTRINGCHECKED> /> 
+                        by 4 characters long random text</p></td>
+                        	</tr>
+                        	<tr>
+                        		<td><p><input type="radio" name="forwarder" id="releaseName" value="releaseName"" <TMPL_VAR NAME=RELEASENAMECHECKED> /> by release ID</p></td>
+                        	</tr>
+                        	<tr>
+                        		<td><p><input type="radio" name="forwarder" value="customString" id=customString <TMPL_VAR NAME=CUSTOMSTRINGCHECKED> /> by custom name</p></td>
+                        	</tr>
+                        	<tr>
+                        		<td><input type=text id=textField name="customDir" value="<TMPL_VAR NAME=CUSTOMDIR>"</td>
+                        	</tr>
+                        </table>
+                    </p>
+                
+                    <p class=highlight><TMPL_VAR NAME=ERRORMESSAGE></p>
+                    <p> 
+                        <input type="submit" value="Next">
+                        <input type="hidden" name="rm" value="wizardUploadFile">
+                        <input type="hidden" name="randomDirName" value="<TMPL_VAR NAME=RANDOM_DIR_NAME>">
+                    </p>
+                </form>
+             </div>
+        </div>
+        <div class="75">
+            <div class="subcr">
+                
+                <p style="padding-top:60px">
+                    Your download URL is:<br> 
+                    <TMPL_VAR NAME=DOWNLOAD_DEF_PATH>/<span style="font-weight:bold;" id="releaseUrl"></span>
+                </p>
+                
+            </div>
+        </div>         
+    </div>
+                
+    <blockquote>
+        <p>At this stage we define the web address which is printed on the download voucher. 'My Favorite Things' tries to create nice download addresses. So instead of <TMPL_VAR NAME=DOWNLOAD_CGI_PATH>?...
+        it assembles something like <TMPL_VAR NAME=DOWNLOAD_DEF_PATH>/abcd.</p>
+    
+        <p>Each of your downloads you create with 'My Favorite Things' has a <u>seperate</u> web address. So your best-selling LP "The Dancing Monkeys - We are the monkeys" has for example the URL <TMPL_VAR NAME=DOWNLOAD_DEF_PATH>/abcd where as the single
+        "The Dancing Monkeys - A monkey in Love" would have <TMPL_VAR NAME=DOWNLOAD_DEF_PATH>/edfs.</p>
+    
+        <p>At this step you define how the last part of the download web address, in the previous example the 'abcd'  or 'edfs' part, should be named.</p>
+    </blockquote>  
 </div>
-<!-- script refers to the previous div container, replaces onLoad for body-->
-<script>
-	if (document.getElementById('customString').checked == true)
-		fieldOn();
-	else
-		fieldOff();	
-</script>
-<blockquote>
-<p>At this stage we define the web address which is printed on the download voucher. 'My Favorite Things' tries to create nice download addresses. So instead of http://your-domain/cgi-bin/DownloadFile.cgi?...
-it assembles something like http://your-domain/downloads/abcd.</p>
-<p>Each of your downloads you create with 'My Favorite Things' has a <u>seperate</u> web address. So your bestselling LP "The Dancing Monkeys - We are the monkeys" has the URL http://your-domain/downloads/abcd where as the single
-"The Dancing Monkeys - A monkey in Love" would have http://your-domain/download/edfs.</p>
-<p>Here you define how the last part of the download web address, in the previous example the 'abcd'  or 'edfs' part, should be named.</p>
-</blockquote>  
 
 
+ <script>
+ $(document).ready(function(){
+     
+    var randomDir="<TMPL_VAR NAME=RANDOM_DIR_NAME>";
+    var releaseId="<TMPL_VAR NAME=RELEASEID>";
+    var customText="a-good-record"; 
+    
+  
+    if ( $('#customString').attr('checked')) {
+        $('#releaseUrl').text($('#textField').val());
+        $('#textField').select();
+    }
+    else {
+        $('#textField').attr('disabled', true);
+        $('#releaseUrl').text(randomDir);
+    }
+  
+	$('#randomString').click(function(){
+        $('#releaseUrl').text(randomDir);
+        $('#textField').val("");
+        $('#textField').attr('disabled', true);
+    });
+	
+	$('#releaseName').click(function(){
+        $('#releaseUrl').text(releaseId);
+        $('#textField').val("");
+        $('#textField').attr('disabled', true);
+    });
+	
+	$('#customString').click(function(){
+        $('#releaseUrl').text(customText);
+        $('#textField').removeAttr('disabled');
+        $('#textField').val(customText);
+        $('#textField').select();
+    });
+
+    // replace whitespace with "-" and
+    // copy textfield content to release-url display
+    $('#textField').keyup(function(){
+        var textFieldData = $(this).val();
+        textFieldData = textFieldData.replace(/ /g,"-");
+
+        $('#releaseUrl').text(textFieldData );
+        $(this).val(textFieldData);
+    });
+
+    
+    
+    
+ })
+ </script>
 
 
