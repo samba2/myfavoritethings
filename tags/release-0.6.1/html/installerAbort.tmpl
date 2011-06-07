@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>My Favorite Things Installer - Abort Installation</title>
+</head>
+<body>
+The installation has failed. The following error occured:  
+<p><span style="color:red">
+
+<TMPL_IF NAME=WEB_LIB_COPY_FAILED>
+Couldn't copy the web library-files from <TMPL_VAR NAME=WEB_LIB_SOURCE> to <TMPL_VAR NAME=WEB_LIB_PATH>. <br>
+</TMPL_IF>
+
+<TMPL_IF NAME=CANT_CREATE_FORWARDER_PATH>
+Can't create the forwarder directory <TMPL_VAR NAME=FORWARDER_PATH>.<br>
+</TMPL_IF>
+
+<TMPL_IF NAME=NO_WEB_ACCHESS>
+I have created the file test.txt under <a href="<TMPL_VAR NAME=TEST_URL>" target=_blank><TMPL_VAR NAME=TEST_URL></a>.<br> 
+However, I can't access it.
+</TMPL_IF>
+
+<TMPL_IF NAME=NO_WRITE_IN_FORWARDER_PATH>
+I have successfully written the file <TMPL_VAR NAME=FORWARDER_TEST_FILE> but now I can't remove it.
+</TMPL_IF>
+
+<TMPL_IF NAME=ERROR_DESC>
+The server  error message is: <TMPL_VAR NAME=ERROR_DESC>
+</TMPL_IF>
+
+</span></p>
+Please correct the error and repeat the install process.
+
+</body>
+</html>
