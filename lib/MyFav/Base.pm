@@ -180,7 +180,7 @@ sub renderPage {
 	$startTmpl->param( "WEB_LIB_PATH"   => $configDb->getWebLibBaseUrl() );
 	
 	if (! $isPublic) {
-		$startTmpl->param( "DISPLAYHEADER"   => "1" );
+		$startTmpl->param( "INTERNAL"   => "1" );
 	}
 
 	my $menuTmpl = $self->load_tmpl("pageMenu.tmpl");
@@ -278,6 +278,55 @@ sub getUnescapedValue {
 	return $unEscapedvalue;
 }
 
+sub getDateHash {
+    my $self = shift;
+    my $dateString = shift;
+
+    if ( $dateString =~ m/\A(\d\d)(\d\d)(\d\d\d\d)\Z/) {
+        my %dateHash  = (
+            "month" => $1,
+            "day" => $2,
+            "year" => $3);
+         return \%dateHash;   
+    }       
+}
+
+sub isAnExpiryDate {
+    my $self = shift;
+    my $dateString = shift;
+    
+    if ($dateString =~ m/\A\d{8}\Z/) {
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+# only allow date if it is in range now <= date <= (date + approx. 500 years) 
+sub isValidExpiryDate {
+    my $self = shift;
+    my $date = shift;
+    my $validUntilYears = 500;
+    
+    my $dateHashRef = $self->getDateHash($date);  
+
+    my $nowEpoch = time();
+
+    # add seconds for 500 years to now, ignore leap years
+    my $maxEpochTime = $nowEpoch + $validUntilYears * 365 * 24 * 60 * 60;         
+
+    my $dateEpochTime;
+    eval {
+        $dateEpochTime = timelocal(00 ,00 ,00 ,$$dateHashRef{'day'} ,$$dateHashRef{'month'}-1, $$dateHashRef{year});
+    };
+
+    if ($nowEpoch < $dateEpochTime && $maxEpochTime > $dateEpochTime) {
+        return 1;
+    }       
+
+    return 0;
+} 
 
 ##############################################
 # Setup and Init methods

@@ -34,6 +34,7 @@ sub setup {
 		'deleteReleaseFinal'    => 'runModeDeleteReleaseFinal',
 		'changePassword'        => 'runModeChangePassword',
 		'processPasswordChange' => 'runModeProcessPasswordChange',
+		'changeStatus'          => 'runModeChangeReleaseStatus',
 		'checkCodeStatus'       => 'runModeCheckCodeStatus',
 		'processCodeStatus'     => 'runModeProcessCodeStatus',
 		'finishCodeStatus'      => 'runModeFinishCodeStatus',
@@ -57,7 +58,7 @@ sub runModeMainStatusScreen {
 
 	my %releases         = $configDb->getListOfAllReleaseNames();
 	my @sortedReleaseIds = $self->sortHashByValue(%releases);
-
+	
 	# only execute if there are releases at all
 	if (@sortedReleaseIds) {
 		my @loop;
@@ -86,7 +87,7 @@ sub runModeMainStatusScreen {
 		$template->param(
 			"RELEASEDBPATH" => $configDb->getReleaseDbPath($releaseId) );
         $template->param(
-            "STATUS" => $configDb->getStatus($releaseId) );
+            "STATUS" => $self->getFormatedStatus() );
 
 		my $uploadFile = $configDb->getUploadFilePath($releaseId);
 		
@@ -324,6 +325,33 @@ sub runModeFinishCodeStatus {
 	return $self->renderPage($template);
 }
 
+sub runModeChangeReleaseStatus {
+    my $self = shift;
+    my $releaseId    = $self->getReleaseId();
+    
+    my $configDb  = $self->getConfigDb();
+    my $status = $configDb->getStatus($releaseId);
+    
+    # status change only allowed when release is online
+    if ( $status eq "Online" ) {
+        my $offlineFromVal = $self->getOfflineFrom();
+        
+        if ( $offlineFromVal eq "now") {
+            $configDb->updateStatus($releaseId, "Offline")
+        }
+        elsif ( $self->isValidExpiryDate($offlineFromVal)) {
+            $configDb->updateStatus($releaseId, $offlineFromVal)
+        }
+    }
+    # set status back to "Online"
+    elsif ( $status eq "Offline" || 
+            $self->isAnExpiryDate($status) ||
+            $status eq "Expired" ) {
+        $configDb->updateStatus($releaseId, "Online")    
+    }
+    return $self->runModeMainStatusScreen();
+}
+
 sub runModeExportToCsv {
 	my $self = shift;
 
@@ -379,6 +407,21 @@ sub setupStreamingHeader {
 	binmode STDOUT;
 }
 
+sub getFormatedStatus {
+    my $self = shift;
+    my $releaseId    = $self->getReleaseId();
+    
+    my $configDb = $self->getConfigDb();
+    my $status = $configDb->getStatus($releaseId);
+    
+    if ( $self->isAnExpiryDate($status))  {
+        my $dateHashRef = $self->getDateHash($status);
+        return "Expires at $$dateHashRef{'month'}/$$dateHashRef{'day'}/$$dateHashRef{'year'}"    
+    }
+    return $status;
+}
+
+
 sub getConfigDb {
 	return $configDb;
 }
@@ -410,6 +453,14 @@ sub getFileModificationType {
     my $cgi = $self->query();
     return $cgi->param("modType");
 }
+
+sub getOfflineFrom {
+    my $self = shift;
+
+    my $cgi = $self->query();
+    return $cgi->param("offlineFrom");
+}
+
 
 sub getInputChecker {
 	my $self = shift;

@@ -42,11 +42,11 @@
                 Please select the ZIP file containing the packed MP3 files
             </p>
             <p>
-                <input onchange='check_extension(this.value,"upload");' name="fileName" type="file" size="20" />
+                <input id="fileName" name="fileName" type="file" size="20" />
                 <p class=highlight>
                     <TMPL_VAR NAME=ERRORMESSAGE>
                 </p>
-                <input type="submit" id="upload" name="submitButton" disabled="disabled" value="Upload" />
+                <input type="submit" id="submitButton" name="submitButton" disabled="disabled" value="Upload" />
 				<input type="hidden" name="rm" value="<TMPL_VAR NAME=NEXTRUNMODE>" />
 				<input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
 				<input type="hidden" name="fileUploaded" value="true" />
@@ -85,5 +85,26 @@
         $('#fileUploadDialog').show("normal");
         $('#nextButton').hide("normal");
     })
+    
+    // check if zip file was selected
+    $('#fileName').change(function(){
+        var allowedExtensions = {
+           '.zip' : 1,
+           '.ZIP' : 1,
+        };
+        
+        var regEx = /\..+$/;
+        var uploadPathData = $(this).val();
+        var extension = uploadPathData.match(regEx);
+        
+        if (allowedExtensions[extension]) {
+            $('#submitButton').removeAttr('disabled');
+        } 
+        else {
+            $('#submitButton').attr('disabled', true);
+            alert("Invalid archive format, please select another file. (Archive must have a 'zip' extension)");
+        }
+    })
+    
  })
  </script>

@@ -209,6 +209,8 @@ sub runModeReleaseCreated {
 		if ( $fileUpload eq "true" ) {
 			$self->uploadFile();
 		}
+		
+		# white spaces checken
 
 		# last steps. try to write forwarder index.html + create release db
 		my $releaseName = $tempDb->getTempValue("releaseName");
