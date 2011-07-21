@@ -26,7 +26,7 @@ No releases found in the database.
         <table>
         	<tr><td>Release name:</td><td><TMPL_VAR NAME=RELEASENAME></td></tr>
         	<tr><td>Release ID:</td><td><TMPL_VAR NAME=RELEASEID></td></tr>
-            <tr><td>Status</td><td><TMPL_VAR NAME=STATUS></td></tr>
+            <tr><td>Status</td><td id='releaseStatus'><TMPL_VAR NAME=STATUS></td></tr>
         	<tr><td>Codes used:</td><td><TMPL_VAR NAME=USEDCODES> of <TMPL_VAR NAME=TOTALCODES></td></tr>
         
         	<TMPL_IF NAME="UPLOADFILESIZE">
@@ -60,9 +60,13 @@ No releases found in the database.
         &nbsp; | &nbsp;
         <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=exportToCsv&releaseId=<TMPL_VAR NAME=RELEASEID>">Export CSV-File</a>
         &nbsp; | &nbsp; 
-        <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=checkCodeStatus&releaseId=<TMPL_VAR NAME=RELEASEID>">Code Status</a>
+        <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=checkCodeStatus&releaseId=<TMPL_VAR NAME=RELEASEID>">Check Code Status</a>
         &nbsp; | &nbsp;
         <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=deleteRelease&releaseId=<TMPL_VAR NAME=RELEASEID>">Delete Release</a>
+        &nbsp; | &nbsp;
+        <!-- Link for release status change -->
+        <a id="changeReleaseStatus" href="#">Change Release Status</a>
+
     </p>
 </TMPL_IF>
 
@@ -84,18 +88,136 @@ No releases found in the database.
 </div>
 </div>
 
+<div id="dialogChangeReleaseStatus" title="Change Release Status">
+   <form id="formChangeReleaseStatus" action="<TMPL_VAR NAME=SCRIPTNAME>">
+       
+       <!-- different user questions depending on status -->
+       <p id='paraSetOffline'>When shall this release become unavailable for public access?</p>
+       <p id='paraSetOnline'>Do you want to set the release "<TMPL_VAR NAME=RELEASENAME>" online?</p>
+       <p id='paraNoChangeFileMissing'>To change the status of release "<TMPL_VAR NAME=RELEASENAME>" you have to upload a file first.</p>
+       <p id='paraRemoveExpiry'>Remove the expiry date of the release?</p>
+       
+       <div style="text-align:center;">
+          <div id='divInputsSetOffline'>
+               <p>
+                   <input type="radio" name="offlineFrom" value="now" id="radioSetOfflineNow" /> Now
+                   <input type="radio" name="offlineFrom" value="date" id="radioSetOfflineLater" /> In the future
+               </p>
+               <div id="divDatePicker">
+                   <p>Date: <input type="text" style="width: 70px" id="txtDatePicker" /></p>
+               </div>
+           </div>
+           <p><button id="buttonOK">OK</button></p> 
+           <input type="hidden" name="rm" value="changeStatus" />
+           <input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
+       </div>
+   </form>
+</div>
+
+
  <script>
  $(document).ready(function(){
+     
+    // hide dialog divs
  	$('#dialogExtraInformation').hide();
+    $('#dialogChangeReleaseStatus').hide();
 	
-    $('#showDetails').click(function () {
-        $( "#dialogExtraInformation" ).dialog({ width: 600 });
-    })
-    
+    // open release on select
     $('#releaseSelectionForm').change(function(){
         if ($('#releaseSelectionForm :selected').val()) {
             $(this).submit();
         }
     }); 
+
+    // handle changing release status
+    $('#changeReleaseStatus').click(function () {
+        //prepare
+        hideElements();
+        setupReleaseStatusButton();
+        // display button
+        $( "#dialogChangeReleaseStatus" ).dialog({ minHeight: 100 });
+        
+        // click functions
+        $('#radioSetOfflineNow').click(function () {
+            // reset datePicker if selected before
+            $('#divDatePicker').hide("normal");
+            $('#txtDatePicker').val("");
+            $('#buttonOK').removeAttr('disabled');  
+         });
+         
+        $('#radioSetOfflineLater').click(function () {
+            // reset "Save" to disabled if coming from "radioSetOfflineNow"
+            $('#buttonOK').attr('disabled', true);
+            $('#divDatePicker').show("normal");
+            $('#txtDatePicker').datepicker({
+                minDate: 0,
+                onSelect: function() { 
+                    enableOKButton();
+                }
+            });
+        });
+        
+        $('#buttonOK').click(function () {
+            var date = "";
+            
+            if ($('#radioSetOfflineLater')) {
+                // set posted value of radio button value to
+                // eg 01242011
+                date = $('#txtDatePicker').val();
+                date = date.replace(/\//g,"");
+                $('#radioSetOfflineLater').val(date);
+            }
+        });
+
+        // helper functions
+        function hideElements () {
+            $('#buttonOK').attr('disabled', true);
+            $('#divDatePicker').hide();
+            $('#paraSetOffline').hide();
+            $('#paraNoChangeFileMissing').hide();
+            $('#paraSetOnline').hide();
+            $('#paraRemoveExpiry').hide();
+            $('#divInputsSetOffline').hide();
+        }
+
+        function setupReleaseStatusButton() {
+            var status = $('#releaseStatus').text();
+            
+            if ( status === "Online" ) {
+                $('#paraSetOffline').show();
+                $('#divInputsSetOffline').show();
+            }
+            else if ( status === "Offline" || status === "Expired" ) {
+                $('#paraSetOnline').show();
+                enableOKButton();
+            }
+            else if ( statusIsExpiryDate(status) ) {
+                $('#paraRemoveExpiry').show(); 
+                enableOKButton();   
+            }
+            else if ( status === "File missing" ) {
+                 $('#paraNoChangeFileMissing').show();
+                 $('#buttonOK').hide();
+            }
+        }
+
+        function statusIsExpiryDate(status) {
+            if ( status.indexOf("Expires at") != -1 ) {
+                return true;
+            }
+            return false;
+        }
+        
+        function enableOKButton() {
+            $('#buttonOK').removeAttr('disabled');
+        }
+        
+    })
+
+    // details button
+    $('#showDetails').click(function () {
+        $( "#dialogExtraInformation" ).dialog({ width: 600 });
+    })
+
  })
  </script>

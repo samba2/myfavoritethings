@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <includepath>
   <includepathentry path="${resource_loc:/mayfav/lib}" />
+  <includepathentry path="${resource_loc:/myfav/lib}" />
 </includepath>
 

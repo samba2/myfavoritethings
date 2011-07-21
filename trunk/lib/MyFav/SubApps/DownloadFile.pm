@@ -71,19 +71,35 @@ sub runModeDownloadWelcomeScreen {
         my $currentUploadFilePath = $configDb->getUploadFilePath($releaseId) or die "";
         my $status = $configDb->getStatus($releaseId) or die "";
 
-        if ( $status ne "Online") {
+        my $statusIsExpiryDate = $self->isAnExpiryDate($status);
+
+        if ( $statusIsExpiryDate ) {
+            if ( ! $self->isValidExpiryDate($status) ) {
+                $status = "Expired";
+                $statusIsExpiryDate = 0;
+                my $configDb = $self->createConfigDbObject();
+                $configDb->updateStatus($releaseId, $status);
+            }
+        }
+
+        if ( $status eq "Online" || $statusIsExpiryDate ) {
+            $template = $self->load_tmpl("downloadInputCode.tmpl");
+            $template->param( "SCRIPTNAME"   => $self->getCgiScriptName );
+            $template->param( "ERRORMESSAGE" => $errorMsg );
+            $template->param( "RELEASENAME"  => $releaseName );
+            $template->param( "R"            => $releaseIdHash );
+        }
+		else {
             $template = $self->load_tmpl("downloadNotAvailable.tmpl");
-            
             if ( $status eq "File missing") {
                 $template->param( "FILE_MISSING"   => 1 );                
             }
-        }
-		else {
-			$template = $self->load_tmpl("downloadInputCode.tmpl");
-			$template->param( "SCRIPTNAME"   => $self->getCgiScriptName );
-			$template->param( "ERRORMESSAGE" => $errorMsg );
-			$template->param( "RELEASENAME"  => $releaseName );
-			$template->param( "R"            => $releaseIdHash );
+            elsif ( $status eq "Offline") {
+                $template->param( "OFFLINE"   => 1 );
+            }
+            elsif ( $status eq "Expired" ) {
+                $template->param( "EXPIRED"   => 1 );
+            }
 		}
 	};
 

@@ -2,9 +2,11 @@ package MyFav::CheckInput;
 
 use strict;
 use CGI::Carp qw ( fatalsToBrowser );  
+use Time::Local;
 
 use MyFav::DB::ConfigDB;
 use MyFav::Base;
+
 use Number::Bytes::Human qw(format_bytes);
 
 my $textAllowedCharacters =
@@ -260,7 +262,6 @@ sub checkDownloadCode {
 	return $error;
 }
 
-
 sub hasValidCharacters {
 	my $self       = shift;
 	my $testString = shift;
@@ -296,7 +297,6 @@ sub isValidDirectoryName {
 		return 0;
 	}
 }
-
 
 
 sub containsWhiteSpace {
