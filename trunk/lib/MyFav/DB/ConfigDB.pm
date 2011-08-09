@@ -271,6 +271,74 @@ sub getLabelAd {
 	return $result;
 }
 
+sub getReleaseLabelHeader {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $result = $self->selectSingleValue("SELECT dataVal FROM $dataBaseName WHERE project='$releaseId' and keyVal='labelHeader'");
+    return $result;
+}
+
+sub getReleaseLabelFooter {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $result = $self->selectSingleValue("SELECT dataVal FROM $dataBaseName WHERE project='$releaseId' and keyVal='labelFooter'");
+    return $result;
+}
+
+sub getActiveLabelHeader {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $globalLabelHeader = $self->getLabelHeader($releaseId);
+    my $releaseLabelHeader = $self->getReleaseLabelHeader($releaseId);
+    
+    if ( $releaseLabelHeader) {
+        return $releaseLabelHeader;
+    }
+    else {
+        return $globalLabelHeader;
+    }
+}
+
+sub getActiveLabelFooter {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $globalLabelFooter = $self->getLabelFooter($releaseId);
+    my $releaseLabelFooter = $self->getReleaseLabelFooter($releaseId);
+    
+    if ( $releaseLabelFooter) {
+        return $releaseLabelFooter;
+    }
+    else {
+        return $globalLabelFooter;
+    }
+}
+
+sub isVoucherHeaderDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $result = $self->selectSingleValue("SELECT COUNT(*) FROM $dataBaseName WHERE project='$releaseId' and keyVal='voucherHeaderDisabled'");
+    return $result;
+}
+
+sub isVoucherFooterDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+    
+    my $result = $self->selectSingleValue("SELECT COUNT(*) FROM $dataBaseName WHERE project='$releaseId' and keyVal='voucherFooterDisabled'");
+    return $result;
+}
+
 
 # only for first time installation
 sub updateDownloadCgiPath {
@@ -329,6 +397,90 @@ sub updateStatus {
     my $dataBaseName = $self->getDataBaseName();
 
     $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newStatus' WHERE project='$releaseId' AND keyVal='status'");
+}
+
+sub insertReleaseVoucherHeader {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $newHeaderText = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'labelHeader', '$newHeaderText')");
+}
+
+sub updateReleaseVoucherHeader {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $newHeaderText = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newHeaderText' WHERE project='$releaseId' AND keyVal='labelHeader'");
+}
+
+sub deleteReleaseVoucherHeader {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='labelHeader'");
+}
+
+sub insertReleaseVoucherFooter {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $newHeaderText = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'labelFooter', '$newHeaderText')");
+}
+
+sub updateReleaseVoucherFooter {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $newHeaderText = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newHeaderText' WHERE project='$releaseId' AND keyVal='labelFooter'");
+}
+
+sub deleteReleaseVoucherFooter {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='labelFooter'");
+}
+
+sub insertVoucherHeaderDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'voucherHeaderDisabled', '1')");
+}
+
+sub deleteVoucherHeaderDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='voucherHeaderDisabled'");
+}
+
+sub insertVoucherFooterDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'voucherFooterDisabled', '1')");
+}
+
+sub deleteVoucherFooterDisabled {
+    my $self         = shift;
+    my $releaseId = shift;
+    my $dataBaseName = $self->getDataBaseName();
+
+    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='voucherFooterDisabled'");
 }
 
 
