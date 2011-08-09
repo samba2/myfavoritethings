@@ -31,7 +31,6 @@ sub setup {
         'modifyFile'            => 'runModeModifyFile',
         'processModifyFile'     => 'runModeProcessModifyFile',
         'deleteRelease'         => 'runModeDeleteRelease',
-        'deleteReleaseFinal'    => 'runModeDeleteReleaseFinal',
         'changePassword'        => 'runModeChangePassword',
         'processPasswordChange' => 'runModeProcessPasswordChange',
         'changeStatus'          => 'runModeChangeReleaseStatus',
@@ -194,28 +193,8 @@ sub runModeDeleteRelease {
     my $configDb  = $self->getConfigDb();
     my $releaseId = $self->getReleaseId();
 
-    my $releaseName = $configDb->getReleaseName($releaseId);
-    my $template    = $self->load_tmpl("releasesDeleteRelease.tmpl");
-    $template->param( "SCRIPTNAME"  => $self->getCgiScriptName );
-    $template->param( "RELEASENAME" => "$releaseName" );
-    $template->param( "RELEASEID"   => "$releaseId" );
-
-    return $self->renderPage($template);
-}
-
-sub runModeDeleteReleaseFinal {
-    my $self = shift;
-
-    my $configDb  = $self->getConfigDb();
-    my $releaseId = $self->getReleaseId();
-
-    my $releaseName = $configDb->getReleaseName($releaseId);
-    my $template    = $self->load_tmpl("releasesDeleteReleaseFinal.tmpl");
-    $template->param( "RELEASENAME" => "$releaseName" );
-
     my $pathIndexHtmlDir = $configDb->getPathIndexHtmlDir($releaseId);
     my $releaseDbPath    = $configDb->getReleaseDbPath($releaseId);
-
     my $uploadFilePath = $configDb->getUploadFilePath($releaseId);
 
     eval {
@@ -237,10 +216,10 @@ sub runModeDeleteReleaseFinal {
         }
     };
 
-    if ($@) {
-        $template->param( "ERROR" => "$@" );
-    }
-    return $self->renderPage($template);
+#    if ($@) {
+#       TODO: do something if delete partially fails
+#    }
+    return $self->runModeMainStatusScreen();
 }
 
 sub runModeChangePassword {
@@ -381,7 +360,6 @@ sub runModeChangeReleaseStatus {
 }
 
 
-# TODO   process checkboxes
 sub runModeEditVoucher {
     my $self      = shift;
     my $releaseId = $self->getReleaseId();

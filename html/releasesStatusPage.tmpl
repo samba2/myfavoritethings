@@ -62,7 +62,7 @@ No releases found in the database.
         &nbsp; | &nbsp; 
         <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=checkCodeStatus&releaseId=<TMPL_VAR NAME=RELEASEID>">Check Code Status</a>
         &nbsp; | &nbsp;
-        <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=deleteRelease&releaseId=<TMPL_VAR NAME=RELEASEID>">Delete Release</a>
+        <a id="deleteRelease" href="#">Delete Release</a>
         &nbsp; | &nbsp;
         <a id="changeReleaseStatus" href="#">Change Release Status</a>
         &nbsp; | &nbsp;
@@ -87,7 +87,9 @@ No releases found in the database.
         <tr><td>Path to actual download program: &nbsp;  </td><td> <TMPL_VAR NAME=RELEASECGIURL></td></tr>
     </table>
     </p>
-</div>
+    <p style="text-align:center; padding-top: 10px">
+        <input type="button" id="buttonShowDetailsOK" value="OK">
+    </p>
 </div>
 
 <div id="dialogChangeReleaseStatus" title="Change Release Status">
@@ -184,6 +186,20 @@ No releases found in the database.
     </form>
 </div>
 
+<div id="dialogDeleteRelease" title="Delete '<TMPL_VAR NAME=RELEASENAME>">
+    <form id="formDeleteRelease" action="<TMPL_VAR NAME=SCRIPTNAME>">
+        <p style="color: #ff0000; padding-top: 10px">
+            Do you really want to delete the release '<TMPL_VAR NAME=RELEASENAME>' ?
+        </p>
+        <p style="text-align:center; padding-top: 10px">
+            <input type="submit" id="buttonDeleteReleaseYes" value="Yes">
+            <input type="button" id="buttonDeleteReleaseCancel" value="Cancel">
+            <input type="hidden" name="rm" value="deleteRelease" />
+            <input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
+        </p>
+    </form>
+</div>
+
  <script>
  $(document).ready(function(){  
      
@@ -191,6 +207,7 @@ No releases found in the database.
  	$('#dialogExtraInformation').hide();
     $('#dialogChangeReleaseStatus').hide();
     $('#dialogEditVoucher').hide();
+    $('#dialogDeleteRelease').hide();
     
 	
     // open release on select
@@ -288,6 +305,21 @@ No releases found in the database.
     // details dialog
     $('#showDetails').click(function () {
         $( "#dialogExtraInformation" ).dialog({ width: 600 });
+        
+        $('#buttonShowDetailsOK').click(function () {
+            $( "#dialogExtraInformation" ).dialog('close');        
+        })
+    })
+    
+    // dialog "delete release"
+    $('#deleteRelease').click(function () {
+        $( "#dialogDeleteRelease" ).dialog({ height: 'auto',
+                                             minHeight: 50,
+                                             modal: true });
+                                             
+        $('#buttonDeleteReleaseCancel').click(function () {
+            $( "#dialogDeleteRelease" ).dialog('close');        
+        })
     })
     
     // edit voucher dialog
