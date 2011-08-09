@@ -93,16 +93,22 @@
            '.ZIP' : 1,
         };
         
-        var regEx = /\..+$/;
         var uploadPathData = $(this).val();
-        var extension = uploadPathData.match(regEx);
         
-        if (allowedExtensions[extension]) {
-            $('#submitButton').removeAttr('disabled');
-        } 
-        else {
+        var regExExtension = /\..+$/;
+        var regExWhiteSpace = /\s/;
+
+        var extension = uploadPathData.match(regExExtension);
+        
+        if ( ! allowedExtensions[extension]) {
             $('#submitButton').attr('disabled', true);
-            alert("Invalid archive format, please select another file. (Archive must have a 'zip' extension)");
+            alert("Upload rejected: Invalid archive format, please select another file. (Archive must have a 'zip' extension)");
+        } 
+        else if ( uploadPathData.match(regExWhiteSpace) ) {
+            alert("Upload rejected: The filename must not include white spaces.");
+        }
+        else {
+            $('#submitButton').removeAttr('disabled');
         }
     })
     
