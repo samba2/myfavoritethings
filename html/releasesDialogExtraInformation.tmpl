@@ -1,0 +1,18 @@
+<div id="dialogExtraInformation" title="Release Details">
+    <p><h4>Paths</h4></p>
+    <p>
+    <table>
+        <tr><td>Public download URL (forwarder): </td><td> <TMPL_VAR NAME=DOWNLOADURL></td></tr>
+    
+        <TMPL_IF NAME="UPLOADFILEPATH">
+            <tr><td>Path to uploaded archive file: </td><td> <TMPL_VAR NAME=UPLOADFILEPATH></td></tr>
+        </TMPL_IF>
+        
+        <tr><td>Path to database file containing <br> the download codes: </td><td> <TMPL_VAR NAME=RELEASEDBPATH></td></tr>
+        <tr><td>Path to actual download program: &nbsp;  </td><td> <TMPL_VAR NAME=RELEASECGIURL></td></tr>
+    </table>
+    </p>
+    <p style="text-align:center; padding-top: 10px">
+        <input type="button" id="buttonShowDetailsOK" value="OK">
+    </p>
+</div>

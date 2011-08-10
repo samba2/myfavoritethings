@@ -51,7 +51,7 @@ sub runModeMainStatusScreen {
     # prevent warnings in server log, so better set it to zero size
     if ( !$releaseId ) { $releaseId = "" }
 
-    my $template = $self->load_tmpl("releasesStatusPage.tmpl");
+    my $template = $self->load_tmpl("releasesMainStatusPage.tmpl");
 
     my %releases         = $configDb->getListOfAllReleaseNames();
     my @sortedReleaseIds = $self->sortHashByValue(%releases);
@@ -122,7 +122,7 @@ sub runModeMainStatusScreen {
             $template->param("VOUCHER_FOOTER_DISABLED" => "checked" );
         }    
 
-        # store defaults in hidden filds    
+        # store defaults in hidden fields    
         $template->param(
             "VOUCHER_GLOBAL_HEADER" => $configDb->getLabelHeader() );
         $template->param(
@@ -132,7 +132,6 @@ sub runModeMainStatusScreen {
         $template->param( "VOUCHER_AD"   => $configDb->getLabelAd($releaseId) );
         $template->param( "VERSION_ID"   => $configDb->getVersionId() );
     }
-
     return $self->renderPage($template);
 }
 
