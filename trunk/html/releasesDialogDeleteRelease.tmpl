@@ -1,0 +1,13 @@
+<div id="dialogDeleteRelease" title="Delete '<TMPL_VAR NAME=RELEASENAME>">
+    <form id="formDeleteRelease" action="<TMPL_VAR NAME=SCRIPTNAME>">
+        <p style="color: #ff0000; padding-top: 10px">
+            Do you really want to delete the release '<TMPL_VAR NAME=RELEASENAME>' ?
+        </p>
+        <p style="text-align:center; padding-top: 10px">
+            <input type="submit" id="buttonDeleteReleaseYes" value="Yes">
+            <input type="button" id="buttonDeleteReleaseCancel" value="Cancel">
+            <input type="hidden" name="rm" value="deleteRelease" />
+            <input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
+        </p>
+    </form>
+</div>
