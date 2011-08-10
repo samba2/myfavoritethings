@@ -155,6 +155,20 @@ sub getCgiParamsHash {
 	return %cgiParams;
 }
 
+sub getReleaseId {
+    my $self = shift;
+
+    my $cgi = $self->query();
+    return $cgi->param("releaseId");
+}
+
+sub getDownloadCode {
+    my $self = shift;
+
+    my $cgi = $self->query();
+    return $cgi->param("downloadCode");
+}
+
 sub getFileName {
     my $self      = shift;
     my %cgiParams = $self->getCgiParamsHash();
@@ -395,6 +409,13 @@ sub createConfigDbObject {
 		"dataBaseName" => "config",
 		"dataBaseDir"  => $self->getDataBaseDir());
 	return $configDb;	
+}
+
+sub getInputChecker {
+    my $self = shift;
+
+    my %cgiParams = $self->getCgiParamsHash();
+    return MyFav::CheckInput->new(%cgiParams);
 }
 
 

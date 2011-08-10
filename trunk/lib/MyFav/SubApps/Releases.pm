@@ -35,9 +35,6 @@ sub setup {
         'processPasswordChange' => 'runModeProcessPasswordChange',
         'changeStatus'          => 'runModeChangeReleaseStatus',
         'editVoucher'           => 'runModeEditVoucher',
-        'checkCodeStatus'       => 'runModeCheckCodeStatus',
-        'processCodeStatus'     => 'runModeProcessCodeStatus',
-        'finishCodeStatus'      => 'runModeFinishCodeStatus',
         'exportToCsv'           => 'runModeExportToCsv',
         'exportToPdf'           => 'runModeExportToPdf',
         'logout'                => 'runModeLogout',
@@ -216,9 +213,6 @@ sub runModeDeleteRelease {
         }
     };
 
-#    if ($@) {
-#       TODO: do something if delete partially fails
-#    }
     return $self->runModeMainStatusScreen();
 }
 
@@ -259,75 +253,6 @@ sub runModeProcessPasswordChange {
         my $template = $self->load_tmpl("releasesPasswordChanged.tmpl");
         return $self->renderPage($template);
     }
-}
-
-sub runModeCheckCodeStatus {
-    my $self  = shift;
-    my $error = shift;
-
-    my $releaseId = $self->getReleaseId();
-
-    my $template = $self->setupForm( "releasesCheckCodeStatus.tmpl", $error );
-    $template->param( "RELEASEID" => "$releaseId" );
-    return $self->renderPage($template);
-}
-
-# print code info
-sub runModeProcessCodeStatus {
-    my $self         = shift;
-    my $releaseId    = $self->getReleaseId();
-    my $downloadCode = $self->getDownloadCode();
-
-    my $inputChecker = $self->getInputChecker();
-    my $inputError   = $inputChecker->checkDownloadCode();
-
-    my $releaseDb  = $self->getReleaseDb($releaseId);
-    my $codeExists = $releaseDb->codeExists($downloadCode);
-
-    # code had invalid format
-    if ($inputError) {
-        return $self->runModeCheckCodeStatus($inputError);
-    }
-    elsif ( !$codeExists ) {
-        return $self->runModeCheckCodeStatus(
-            "The code '$downloadCode' is not existing.");
-    }
-
-    my $template = $self->load_tmpl("releasesProcessCodeStatus.tmpl");
-    $template->param( "DOWNlOADCODE" => $downloadCode );
-    $template->param( "RELEASEID"    => $releaseId );
-
-    if ( !$releaseDb->codeIsUsed($downloadCode) ) {
-        $template->param( "CODENOTUSED" => "1" );
-    }
-    elsif ( $self->codeIsInsideDownloadTimeFrame( $releaseId, $downloadCode ) )
-    {
-        $template->param( "CODESTATUS" =>
-              "The code was used and is still inside the download frame." );
-    }
-    else {
-        $template->param( "CODESTATUS" => "The code has expired." );
-    }
-    return $self->renderPage($template);
-}
-
-# perform code reset
-sub runModeFinishCodeStatus {
-    my $self         = shift;
-    my $releaseId    = $self->getReleaseId();
-    my $downloadCode = $self->getDownloadCode();
-
-    my $releaseDb = $self->getReleaseDb($releaseId);
-
-    # reset code to unused
-    $releaseDb->setCodeToUnused($downloadCode);
-
-    my $template = $self->load_tmpl("releasesFinishCodeStatus.tmpl");
-
-    if ( $releaseDb->codeIsUsed($downloadCode) ) {
-        $template->param( "ERROR" => "1" );
-    }
-    return $self->renderPage($template);
 }
 
 sub runModeChangeReleaseStatus {
@@ -529,20 +454,6 @@ sub setConfigDb {
     $configDb = $value;
 }
 
-sub getReleaseId {
-    my $self = shift;
-
-    my $cgi = $self->query();
-    return $cgi->param("releaseId");
-}
-
-sub getDownloadCode {
-    my $self = shift;
-
-    my $cgi = $self->query();
-    return $cgi->param("downloadCode");
-}
-
 sub getFileModificationType {
     my $self = shift;
 
@@ -585,12 +496,5 @@ sub getDisableFooter {
     return $cgi->param("buttonEditVoucherDisableFooter");
 }
 
-
-sub getInputChecker {
-    my $self = shift;
-
-    my %cgiParams = $self->getCgiParamsHash();
-    return MyFav::CheckInput->new(%cgiParams);
-}
 
 1;
