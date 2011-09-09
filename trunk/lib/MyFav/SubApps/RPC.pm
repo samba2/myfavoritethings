@@ -32,6 +32,9 @@ sub setup {
 		'printError'  => 'runModePrintError',
 		'getCodeStatus'  => 'runModeGetCodeStatus',
 		'resetCode' => 'runModeResetCode',
+		'getUploadStatus' => 'runModeGetUploadStatus',
+        'rpcEcho' => 'runModeRpcEcho',
+		
 		'AUTOLOAD'     => $self->can('runModePrintError')
 	);
 }
@@ -47,6 +50,13 @@ sub runModePrintError {
         return '{"error": "Sorry, an error occured"}';
     }
 }
+
+sub runModeRpcEcho {
+    my $self = shift;
+    
+   return "{\"rpcEcho\": \"true\"}";
+}
+
 
 sub runModeGetCodeStatus {
     my $self = shift;
@@ -141,5 +151,33 @@ sub runModeResetCode {
 
     return $output;   
 }
+
+sub runModeGetUploadStatus {
+    my $self = shift;
+    my $output="";
+
+    # status file is written based on session id
+    my $uploadStatusFile = $self->getUploadStatusFilePath();
+
+    if ( $self->fileExists($uploadStatusFile)) {
+    print STDERR "hiera\n";
+
+        open (FH, $uploadStatusFile);
+        my @fileContent = <FH>;
+        close (FH);
+        
+        foreach my $line (@fileContent) {
+            $output .= $line;
+         
+        }
+        return $output;
+    }
+    else {
+        
+        
+        return $self->runModePrintError("No file present");
+    }
+}
+
 
 1;
