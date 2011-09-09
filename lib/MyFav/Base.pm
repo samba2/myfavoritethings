@@ -12,6 +12,8 @@ use CGI::Application::Plugin::Session; # local
 use CGI::Application::Plugin::Redirect;  #local
 use MIME::Base64;  # core 
 use File::Basename;  # core
+use File::Spec; # core
+
 
 use base 'CGI::Application';
 
@@ -28,6 +30,7 @@ my $webLibPath = '../myfavLibs';
 my $fileDir = "../upload_files";
 my $sessionDir = "../sessions";
 my $releaseDbPrefix = 'codes_for_';  # prefix for releaseDb csv files, prevents non-alphanum. start of file
+my $uploadStatusFilePrefix = 'myfav_upload_status_';
 
 # implements login for admin modules like releases.pm and wizard.pm
 sub cgiapp_prerun {
@@ -52,6 +55,7 @@ sub cgiapp_prerun {
 # Special Run Modes
 ##############################################
 
+# disaplyed if runmode supplied by client could not be detected
 sub runModeDefault {
 	return "Welcome to the end of the world. Its going to be really scarry out here."
 }
@@ -173,6 +177,15 @@ sub getFileName {
     my $self      = shift;
     my %cgiParams = $self->getCgiParamsHash();
     return $cgiParams{"fileName"};
+}
+
+# read session id from server environment, 
+# example session id var:
+# HTTP_COOKIE='CGISESSID=f27fd67467a3dd27086021ff6a5926b9'
+sub getSessionId {
+    ( my $sessionId ) = $ENV{'HTTP_COOKIE'} =~ 'CGISESSID=([0-9a-z]+)';
+
+    return "$sessionId"; 
 }
 
 ##############################################
@@ -447,6 +460,10 @@ sub directoryExists {
 	}	
 }
 
+sub getTempDir {
+    return File::Spec->tmpdir();
+}
+
 ##############################################
 # Misc. methods
 ##############################################
@@ -516,6 +533,9 @@ sub codeIsInsideDownloadTimeFrame {
 }
 
 # handle upload from html form to server
+# at this point the file is already on the server, CGI.pm keeps
+# it in a temp file. so this is actual writing from CGI.pm temp space to
+# the upload destination
 sub uploadFile {
     my $self = shift;
 
@@ -534,6 +554,29 @@ sub uploadFile {
     close UPLOADFILE;
 }
 
+sub getUploadStatusFilePath {
+    my $self = shift;
+
+    my $sessionId = $self->getSessionId();
+    my $tmpDir = $self->getTempDir();
+    my $uploadFileprefix = $self->getUploadStatusFilePrefix();
+    
+    return "$tmpDir/$uploadFileprefix$sessionId";
+}
+
+sub uploadCgiHook {
+    my ($fileName, undef, $bytesRead, undef) = @_;
+
+    my $baseClass = MyFav::Base->new();
+    my $totalBytes = $baseClass->getCgiContentLength();
+    my $bytesReadPercent = ( $bytesRead * 100 ) / $totalBytes;
+
+    my $uploadStatusFileName = $baseClass->getUploadStatusFilePath();
+
+    open (FH,">$uploadStatusFileName");
+    printf FH ("{\"uploadStatus\": %d}", $bytesReadPercent );    
+    close FH;
+}
 
 ##############################################
 # Getter for constants
@@ -562,6 +605,12 @@ sub getSessionDir {
 sub getReleaseDbPrefix {
 	return $releaseDbPrefix;
 }
+
+sub getUploadStatusFilePrefix {
+    return $uploadStatusFilePrefix
+;
+}
+
 
 
 1;

@@ -189,7 +189,6 @@ sub runModeUploadFile {
 }
 
 # implement wizardReleaseCreatedWithoutFile
-
 sub runModeReleaseCreated {
 	my $self             = shift;
 	my $internalErrorMsg = shift;
@@ -198,6 +197,13 @@ sub runModeReleaseCreated {
 	my $template;
 
 	if ( !$internalErrorMsg ) {
+        # at this point the file has been uploaded to CGI.pm's temp space.
+        # delete upload-status file
+        eval {
+             my $uploadStatusFileName = $self->getUploadStatusFilePath();
+             unlink $uploadStatusFileName;
+        };
+
 		if ( $fileUpload eq "true" ) {
 			my $error = $inputChecker->checkWizardUploadFile();
 
@@ -210,8 +216,6 @@ sub runModeReleaseCreated {
 			$self->uploadFile();
 		}
 		
-		# white spaces checken
-
 		# last steps. try to write forwarder index.html + create release db
 		my $releaseName = $tempDb->getTempValue("releaseName");
 		my $releaseId   = $tempDb->getTempValue("releaseId");
