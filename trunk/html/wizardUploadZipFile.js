@@ -2,6 +2,7 @@
 
  $(document).ready(function(){
     $('#nextButton').hide();
+    $('#uploadFrame').hide();
                  
     $('#uploadLater').click(function(){
         $('#fileUploadDialog').hide("normal");
@@ -38,27 +39,16 @@
             $('#submitButton').removeAttr('disabled');
         }
     })
-    
+   
     $('#uploadForm').submit(function(){
-        $('#progressBar').progressbar().data('uploadCompleted', false);
-        window.setTimeout(getUploadStatus, 1000);
+        // iframe is always active in the background and already polling
+        // just display the hidden frame including progressbar
+        $('#uploadFrame').show("normal");
 
-        function getUploadStatus() {
-            if ($('#progressBar').data('uploadCompleted')) {
-                $('#progressBar').progressbar('destroy');
-                return;
-            }
-            
-            $.getJSON("RPC.cgi?",
-              {
-               rm: "getUploadStatus"    
-              },
-              function(data) {
-                  if ( data.uploadStatus ) {
-                      $('#progressBar').progressbar('option','value', data.uploadStatus);
-                       window.setTimeout(getUploadStatus, 1500);
-                  }
-              })
-        }
-   }) 
+        // disable upload again
+        $('#submitButton').attr('disabled', true);
+        $('#submitButton').val('Uploading...');
+    }) 
  })
+
+ 

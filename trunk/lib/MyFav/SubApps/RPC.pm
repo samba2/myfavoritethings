@@ -26,6 +26,7 @@ sub setup {
 	my $self = shift;
     $self->header_add( -type => 'text/plain' );
 
+    $self->tmpl_path( $self->getTemplatePath );
 	$self->start_mode('printError');
 	$self->mode_param('rm');
 	$self->run_modes(
@@ -34,7 +35,7 @@ sub setup {
 		'resetCode' => 'runModeResetCode',
 		'getUploadStatus' => 'runModeGetUploadStatus',
         'rpcEcho' => 'runModeRpcEcho',
-		
+        'sendUploadProgressIframeContent' => 'runModeSendUploadProgressIframeContent',
 		'AUTOLOAD'     => $self->can('runModePrintError')
 	);
 }
@@ -177,6 +178,18 @@ sub runModeGetUploadStatus {
         
         return $self->runModePrintError("No file present");
     }
+}
+
+sub runModeSendUploadProgressIframeContent {
+    my $self = shift;
+
+    $self->header_add( -type => 'text/html' );
+    my $tmpl = $self->load_tmpl("wizardUploadZipFileIFrameProgressCounter.tmpl");
+
+    my $configDb = $self->createConfigDbObject();
+    $tmpl->param( "WEB_LIB_PATH"   => $configDb->getWebLibBaseUrl() );
+        
+    return $tmpl->output();
 }
 
 

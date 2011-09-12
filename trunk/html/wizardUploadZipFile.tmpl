@@ -42,16 +42,14 @@
             </p>
             <p>
                 <input id="fileName" name="fileName" type="file" size="20" />
+
                 <p class=highlight>
                     <TMPL_VAR NAME=ERRORMESSAGE>
                 </p>
-                
+                <iframe style="" id="uploadFrame" name="uploadFrame" width="400" height="35" frameborder="0" border="0" src="RPC.cgi?rm=sendUploadProgressIframeContent" scrolling="No" scrollbar="no"> </iframe>
                 <p>
-                    <div id="progressBar"></div><br>
+                    <input type="submit" id="submitButton" name="submitButton" disabled="disabled" value="Upload" />
                 </p>
-                
-                
-                <input type="submit" id="submitButton" name="submitButton" disabled="disabled" value="Upload" />
 				<input type="hidden" name="rm" value="<TMPL_VAR NAME=NEXTRUNMODE>" />
 				<input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
 				<input type="hidden" name="fileUploaded" value="true" />
