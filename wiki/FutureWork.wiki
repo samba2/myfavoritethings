@@ -14,3 +14,4 @@ Implemented but not released yet:
   * Inside the "Add new release" area, defining the central download page (= public URL printed on the voucher) the page contains fixed examples of the possible URL. This should be dynamic examples, containing the real http://my-domain... bits
   * Add a Progress Bar for uploading the music ZIP file
   * Let admin ahange the text of the vouchers
+  * Add Upload Later to an existing project
