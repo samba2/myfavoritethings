@@ -1,0 +1,52 @@
+<div id=releaseStatusPage>
+
+<TMPL_IF NAME=RELEASENAMELOOP>
+<p>
+<form action="<TMPL_VAR NAME=SCRIPTNAME>">
+Select a release &nbsp;
+    <select name="releaseId" size="5">
+        <TMPL_LOOP NAME="RELEASENAMELOOP">
+	      <option value="<TMPL_VAR NAME="RELEASEIDHASH">" ><TMPL_VAR NAME="RELEASENAME"></option>
+         </TMPL_LOOP>    
+    </select>
+	&nbsp; <input type="submit" value="Open">
+</form>
+</p>
+<TMPL_ELSE>
+<p>
+No releases found in the database.
+</p>
+</TMPL_IF>
+
+<TMPL_IF NAME=RELEASEID>
+<p><h4>General</h4></p>
+<p>
+<table>
+	<tr><td>Release name:</td><td><TMPL_VAR NAME=RELEASENAME></td></tr>
+	<tr><td>Release ID:</td><td><TMPL_VAR NAME=RELEASEID></td></tr>
+	<tr><td>Codes used:</td><td><TMPL_VAR NAME=USEDCODES> of <TMPL_VAR NAME=TOTALCODES></td></tr>
+	<tr><td>Size of uploaded file:</td><td><TMPL_VAR NAME=UPLOADFILESIZE>Bytes</td></tr>
+</table>
+</p>
+	
+<p><h4>Paths</h4></p>
+<p>
+<table>
+	<tr><td>Public download URL (forwarder): </td><td> <TMPL_VAR NAME=DOWNLOADURL></td></tr>
+	<tr><td>Path to uploaded archive file: </td><td> <TMPL_VAR NAME=UPLOADFILEPATH></td></tr>
+	<tr><td>Path to database file containing <br> the download codes: </td><td> <TMPL_VAR NAME=RELEASEDBPATH></td></tr>
+	<tr><td>Path to actual download program: &nbsp;  </td><td> <TMPL_VAR NAME=RELEASECGIURL></td></tr>
+</table>
+</p>
+<p>
+<a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=exportToPdf&releaseId=<TMPL_VAR NAME=RELEASEID>">Export Download-Vouchers</a>
+&nbsp; | &nbsp;
+<a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=exportToCsv&releaseId=<TMPL_VAR NAME=RELEASEID>">Export CSV-File</a>
+&nbsp; | &nbsp; 
+<a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=checkCodeStatus&releaseId=<TMPL_VAR NAME=RELEASEID>">Code Status</a>
+&nbsp; | &nbsp;
+<a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=deleteRelease&releaseId=<TMPL_VAR NAME=RELEASEID>">Delete Release</a>
+</p>
+</TMPL_IF>
+
+</div>
