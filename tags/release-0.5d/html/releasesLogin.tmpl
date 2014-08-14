@@ -1,0 +1,13 @@
+<div id=releaseLogin>
+<p>
+<form action=<TMPL_VAR NAME=SCRIPTNAME> method=post>
+<strong>Please enter your login password&nbsp; <input type="password" size=20 maxlength=20 name="loginPassword"></strong>
+<input type="submit" value="Ok">
+
+<input type="hidden" name="o" value="<TMPL_VAR NAME=ORIGIN>" >
+<input type="hidden" name="rm" value="processLogin">
+</form>
+</p>
+<p class=highlight><TMPL_VAR NAME=ERRORMESSAGE></p>
+
+</div>
