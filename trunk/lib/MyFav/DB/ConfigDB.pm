@@ -31,7 +31,7 @@ sub fillWithConfigDefaults {
     $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'forwarderDir', '')");
     $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'loginCgiPath', '')");
 	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'downloadDefaultPath', '')");
-	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'webLibBaseUrl', '')");
+	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'cssPath', '')");
 	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'labelHeader', 'Thank you for buying this vinyl record.You have now the opportunity to download MP3 audio files of the entire recording. To do so, please follow this link and enter the download code.')");
 	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'labelFooter', 'Please note: This is a One-Time download only.')");
 	$self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('GLOBAL', 'labelAd', 'Download powered by')");	
@@ -93,15 +93,6 @@ sub getUploadFilePath {
 	
 	my $result = $self->selectSingleValue("SELECT dataVal FROM config WHERE project='$releaseId' AND keyVal='uploadFilePath'");
 	return $result;
-}
-
-
-sub getStatus {
-    my $self = shift;
-    my $releaseId = shift;
-    
-    my $result = $self->selectSingleValue("SELECT dataVal FROM config WHERE project='$releaseId' AND keyVal='status'");
-    return $result;
 }
 
 
@@ -208,10 +199,10 @@ sub getPathIndexHtmlDir {
 	return $result;
 }
 
-sub getWebLibBaseUrl {
+sub getCssPath {
 	my $self = shift;
 	
-	my $result = $self->selectSingleValue("SELECT dataVal FROM config WHERE project='GLOBAL' and keyVal='webLibBaseUrl'");
+	my $result = $self->selectSingleValue("SELECT dataVal FROM config WHERE project='GLOBAL' and keyVal='cssPath'");
 	return $result;
 }
 
@@ -271,74 +262,6 @@ sub getLabelAd {
 	return $result;
 }
 
-sub getReleaseLabelHeader {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $result = $self->selectSingleValue("SELECT dataVal FROM $dataBaseName WHERE project='$releaseId' and keyVal='labelHeader'");
-    return $result;
-}
-
-sub getReleaseLabelFooter {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $result = $self->selectSingleValue("SELECT dataVal FROM $dataBaseName WHERE project='$releaseId' and keyVal='labelFooter'");
-    return $result;
-}
-
-sub getActiveLabelHeader {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $globalLabelHeader = $self->getLabelHeader($releaseId);
-    my $releaseLabelHeader = $self->getReleaseLabelHeader($releaseId);
-    
-    if ( $releaseLabelHeader) {
-        return $releaseLabelHeader;
-    }
-    else {
-        return $globalLabelHeader;
-    }
-}
-
-sub getActiveLabelFooter {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $globalLabelFooter = $self->getLabelFooter($releaseId);
-    my $releaseLabelFooter = $self->getReleaseLabelFooter($releaseId);
-    
-    if ( $releaseLabelFooter) {
-        return $releaseLabelFooter;
-    }
-    else {
-        return $globalLabelFooter;
-    }
-}
-
-sub isVoucherHeaderDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $result = $self->selectSingleValue("SELECT COUNT(*) FROM $dataBaseName WHERE project='$releaseId' and keyVal='voucherHeaderDisabled'");
-    return $result;
-}
-
-sub isVoucherFooterDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-    
-    my $result = $self->selectSingleValue("SELECT COUNT(*) FROM $dataBaseName WHERE project='$releaseId' and keyVal='voucherFooterDisabled'");
-    return $result;
-}
-
 
 # only for first time installation
 sub updateDownloadCgiPath {
@@ -373,115 +296,12 @@ sub updateDownloadDefaultPath {
 	$self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$downloadDefaultPath' WHERE project='GLOBAL' AND keyVal='downloadDefaultPath'");
 }
 
-sub updateWebLibBaseUrl {
+sub updateCssPath {
 	my $self         = shift;
-	my $webLibBaseUrl  = shift;
+	my $cssPath  = shift;
 	my $dataBaseName = $self->getDataBaseName();
 
-	$self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$webLibBaseUrl' WHERE project='GLOBAL' AND keyVal='webLibBaseUrl'");
+	$self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$cssPath' WHERE project='GLOBAL' AND keyVal='cssPath'");
 }
-
-sub updateUploadFilePath {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $uploadFilePath  = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$uploadFilePath' WHERE project='$releaseId' AND keyVal='uploadFilePath'");
-}
-
-sub updateStatus {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $newStatus  = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newStatus' WHERE project='$releaseId' AND keyVal='status'");
-}
-
-sub insertReleaseVoucherHeader {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $newHeaderText = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'labelHeader', '$newHeaderText')");
-}
-
-sub updateReleaseVoucherHeader {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $newHeaderText = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newHeaderText' WHERE project='$releaseId' AND keyVal='labelHeader'");
-}
-
-sub deleteReleaseVoucherHeader {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='labelHeader'");
-}
-
-sub insertReleaseVoucherFooter {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $newHeaderText = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'labelFooter', '$newHeaderText')");
-}
-
-sub updateReleaseVoucherFooter {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $newHeaderText = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("UPDATE $dataBaseName SET dataVal='$newHeaderText' WHERE project='$releaseId' AND keyVal='labelFooter'");
-}
-
-sub deleteReleaseVoucherFooter {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='labelFooter'");
-}
-
-sub insertVoucherHeaderDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'voucherHeaderDisabled', '1')");
-}
-
-sub deleteVoucherHeaderDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='voucherHeaderDisabled'");
-}
-
-sub insertVoucherFooterDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("INSERT INTO $dataBaseName VALUES ('$releaseId', 'voucherFooterDisabled', '1')");
-}
-
-sub deleteVoucherFooterDisabled {
-    my $self         = shift;
-    my $releaseId = shift;
-    my $dataBaseName = $self->getDataBaseName();
-
-    $self->writeToDataBase("DELETE FROM $dataBaseName WHERE project='$releaseId' AND keyVal='voucherFooterDisabled'");
-}
-
 
 1;

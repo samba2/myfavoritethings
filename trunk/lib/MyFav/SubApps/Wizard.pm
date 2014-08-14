@@ -16,8 +16,6 @@ my $tempDb;
 my $inputChecker;
 my $configDb;
 
-# TODO javascripts als variable in tmpl setzen
-
 sub setup {
 	my $self = shift;
 
@@ -31,8 +29,8 @@ sub setup {
 		'wizardFordwarderDetails' => 'runModeForwarderDetails',
 		'wizardUploadFile'        => 'runModeUploadFile',
 		'wizardReleaseCreated'    => 'runModeReleaseCreated',
-		'AUTOLOAD'                => $self->can('runModeDefault')
-
+		'AUTOLOAD'              => $self->can('runModeDefault')
+		
 	);
 
 	$tempDb = MyFav::DB::TempDB->new(
@@ -60,8 +58,9 @@ sub runModeProjectDetails {
 	my $self     = shift;
 	my $errorMsg = shift;
 
-	my $template = $self->setupForm( "wizardProjectDetails.tmpl", $errorMsg );
-
+	my $template =
+	  $self->setupForm( "wizardProjectDetails.tmpl", $errorMsg );
+	
 	$template->param( "RELEASENAME" => $self->getReleaseName );
 	$template->param( "RELEASEID"   => $self->getReleaseId );
 
@@ -110,16 +109,10 @@ sub runModeForwarderDetails {
 	}
 
 	my $template =
-	  $self->setupForm( "wizardForwarderDetails.tmpl", $internalErrorMsg );
-
-    my $randomDirName= $self->getRandomDirName();
-	  
+	  $self->setupForm( "wizardForwarderDetails.tmpl",
+		$internalErrorMsg );
 	$template->param( "CUSTOMDIR" => $self->getCustomDir() );
-	$template->param( "DOWNLOAD_DEF_PATH" => $configDb->getDownloadDefaultPath() );
-    $template->param( "RELEASEID" => $tempDb->getTempValue("releaseId"));
-    $template->param( "DOWNLOAD_CGI_PATH" => $configDb->getDownloadCgiPath() );
-    $template->param( "RANDOM_DIR_NAME" => $randomDirName );
-      
+
 	# set default selection to "random string"
 	if ( !$self->getForwardButtonState() ) {
 		$self->setForwardButtonState('RANDOMSTRINGCHECKED');
@@ -141,9 +134,16 @@ sub runModeUploadFile {
 		my $forwarderChoice = $self->getForwarderChoice();
 
 		if ( $forwarderChoice eq "randomString" ) {
-			$tempDb->insertTempValue( "releaseForwarderDir", $self->getRandomName() );
-		}
+			my $randomGen = MyFav::RandomNumberGenerator->new();
+			my $randomDirName;
 
+			do {
+				$randomDirName = $randomGen->generateSingleCode(4);
+			  } until (
+				!$self->directoryExists("$forwarderDir/$randomDirName") );
+
+			$tempDb->insertTempValue( "releaseForwarderDir", "$randomDirName" );
+		}
 		# TODO we internally use "releaseName" as variable for this choice
 		# but actually releaseId is used
 		elsif ( $forwarderChoice eq "releaseName" ) {
@@ -178,145 +178,116 @@ sub runModeUploadFile {
 	  $self->setupForm( "wizardUploadZipFile.tmpl", $internalErrorMsg );
 
 	# feed maximum upload size into template to display warning before upload
-	my $formatSize = Number::Bytes::Human->new();
-	my $maxAllowedSizeFormated =
-	  $formatSize->format( $configDb->getMaximumUploadFileSize() );
-	$template->param( "UPLOAD_CHOOSER" => 1 );
-	$template->param( "NEXTRUNMODE" => "wizardReleaseCreated" );
+	my $formatSize             = Number::Bytes::Human->new();
+	my $maxAllowedSizeFormated = $formatSize->format($configDb->getMaximumUploadFileSize());
 	$template->param( "MAXALLOWEDSIZE" => $maxAllowedSizeFormated );
-
+	
 	return $self->renderPage($template);
 }
 
-# implement wizardReleaseCreatedWithoutFile
 sub runModeReleaseCreated {
 	my $self             = shift;
 	my $internalErrorMsg = shift;
 	my $releasePrefix    = $self->getReleaseDbPrefix();
-	my $fileUpload       = $self->getFileUploadedFlag();
 	my $template;
 
 	if ( !$internalErrorMsg ) {
-        # at this point the file has been uploaded to CGI.pm's temp space.
-        # delete upload-status file
-        eval {
-             my $uploadStatusFileName = $self->getUploadStatusFilePath();
-             unlink $uploadStatusFileName;
-        };
+		my $error = $inputChecker->checkWizardUploadFile();
 
-		if ( $fileUpload eq "true" ) {
-			my $error = $inputChecker->checkWizardUploadFile();
-
-			if ($error) {
-				return $self->runModeUploadFile($error);
-			}
+		if ($error) {
+			return $self->runModeUploadFile($error);
 		}
-
-		if ( $fileUpload eq "true" ) {
+		else {
 			$self->uploadFile();
-		}
-		
-		# last steps. try to write forwarder index.html + create release db
-		my $releaseName = $tempDb->getTempValue("releaseName");
-		my $releaseId   = $tempDb->getTempValue("releaseId");
-		my $codeCount   = $tempDb->getTempValue("codeCount");
 
-		my $uploadFilePath = ();
-		if ( $fileUpload eq "true" ) {
-			$uploadFilePath = $self->getFileDir() . "/" . $self->getFileName();
-		}
-		else {
-			$uploadFilePath = "not_defined";
-		}
-		my $releaseIdHash = $self->getHashedValue($releaseId);
+			# last steps. try to write forwarder index.html + create release db
+			my $releaseName = $tempDb->getTempValue("releaseName");
+			my $releaseId   = $tempDb->getTempValue("releaseId");
+			my $codeCount   = $tempDb->getTempValue("codeCount");
+			my $uploadFilePath =
+			  $self->getFileDir() . "/" . $self->getFileName();
+			my $releaseIdHash = $self->getHashedValue($releaseId);
 
-		# build url like http://xxxx/cgi-bin/DownloadFile.cgi?r=hashedreleasid
-		my $releaseCgiUrl =
-		    $configDb->getDownloadCgiPath() . "?r="
-		  . $self->getEscapedValue($releaseIdHash);
+		  # build url like http://xxxx/cgi-bin/DownloadFile.cgi?r=hashedreleasid
+			my $releaseCgiUrl =
+			    $configDb->getDownloadCgiPath() . "?r="
+			  . $self->getEscapedValue($releaseIdHash);
 
-		# build url like http://xxx/DigitalDownload/AXDS/
-		my $downloadUrl =
-		    $configDb->getDownloadDefaultPath() . "/"
-		  . $tempDb->getTempValue("releaseForwarderDir") . "/";
+			# build url like http://xxx/DigitalDownload/AXDS/
+			my $downloadUrl =
+			    $configDb->getDownloadDefaultPath() . "/"
+			  . $tempDb->getTempValue("releaseForwarderDir") . "/";
 
-		# build actual file path for forward like
-		# /var/www/DigitalDownloads/ABCD
-		my $pathIndexHtmlDir =
-		    $configDb->getForwarderDir() . "/"
-		  . $tempDb->getTempValue("releaseForwarderDir");
+			# build actual file path for forward like
+			# /var/www/DigitalDownloads/ABCD
+			my $pathIndexHtmlDir =
+			    $configDb->getForwarderDir() . "/"
+			  . $tempDb->getTempValue("releaseForwarderDir");
 
-		eval {
+			eval {
 
-			# try to write the index.html file containing
-			# the forward to the actual DownloadFile.cgi +
-			$self->writeForwardHtmlFile( $releaseCgiUrl, $pathIndexHtmlDir );
+# try to write the index.html file containing the forward to the actual DownloadFile.cgi +
+				$self->writeForwardHtmlFile( $releaseCgiUrl,
+					$pathIndexHtmlDir );
 
-			# check if url is accessible via the web
-			$self->urlAccessible("$downloadUrl")
-			  or die "Self check failed: Could not open URL $downloadUrl.";
-		};
+				# check if url is accessible via the web
+				$self->urlAccessible("$downloadUrl")
+				  or die "Self check failed: Could not open URL $downloadUrl.";
+			};
 
-		if ($@) {
+			if ($@) {
 
-			# do nothing and print error message
-			$template =
-			  $self->setupForm( "wizardErrorReleaseCreated.tmpl", $@ );
-		}
-		else {
-
-			# everything is fine
-			# create release db object
-			my $releaseDb = MyFav::DB::ReleaseDB->new(
-				"dataBaseName" => $releasePrefix . "$releaseId",
-				"dataBaseDir"  => $self->getDataBaseDir
-			);
-
-			my $releaseDbPath =
-			    $self->getDataBaseDir() . "/"
-			  . $self->getReleaseDbPrefix()
-			  . $releaseId . "."
-			  . $releaseDb->getDbExtension();
-
-			# fill config db with project details
-			$configDb->insertConfigValue( "$releaseId", "releaseId",
-				"$releaseId" );
-			$configDb->insertConfigValue( "$releaseId", "releaseName",
-				"$releaseName" );
-			$configDb->insertConfigValue( "$releaseId", "uploadFilePath",
-				"$uploadFilePath" );
-			$configDb->insertConfigValue( "$releaseId", "releaseDbPath",
-				"$releaseDbPath" );
-			$configDb->insertConfigValue( "$releaseId", "releaseIdHash",
-				"$releaseIdHash" );
-			$configDb->insertConfigValue( "$releaseId", "releaseCgiUrl",
-				"$releaseCgiUrl" );
-			$configDb->insertConfigValue( "$releaseId", "downloadUrl",
-				"$downloadUrl" );
-			$configDb->insertConfigValue( "$releaseId", "pathIndexHtmlDir",
-				"$pathIndexHtmlDir" );
-
-			if ($fileUpload eq "true") {
-                $configDb->insertConfigValue( "$releaseId", "status",
-                    "Online" );
+				# do nothing and print error message
+				$template =
+				  $self->setupForm( "wizardErrorReleaseCreated.tmpl",
+					$@ );
 			}
 			else {
-                $configDb->insertConfigValue( "$releaseId", "status",
-                    "File missing" );
-			}	
-				
-				
 
-			# create release db + writeout codes
-			$releaseDb->createReleaseDataBase();
-			$releaseDb->fillReleaseDataBaseWithNewCodes($codeCount);
-			$template = $self->load_tmpl("wizardReleaseCreated.tmpl");
+				# everything is fine
+				# create release db object
+				my $releaseDb = MyFav::DB::ReleaseDB->new(
+					"dataBaseName" => $releasePrefix . "$releaseId",
+					"dataBaseDir"  => $self->getDataBaseDir
+				);
+
+				my $releaseDbPath =
+				    $self->getDataBaseDir() . "/"
+				  . $self->getReleaseDbPrefix()
+				  . $releaseId . "."
+				  . $releaseDb->getDbExtension();
+
+				# fill config db with project details
+				$configDb->insertConfigValue( "$releaseId", "releaseId",
+					"$releaseId" );
+				$configDb->insertConfigValue( "$releaseId", "releaseName",
+					"$releaseName" );
+				$configDb->insertConfigValue( "$releaseId", "uploadFilePath",
+					"$uploadFilePath" );
+				$configDb->insertConfigValue( "$releaseId", "releaseDbPath",
+					"$releaseDbPath" );
+				$configDb->insertConfigValue( "$releaseId", "releaseIdHash",
+					"$releaseIdHash" );
+				$configDb->insertConfigValue( "$releaseId", "releaseCgiUrl",
+					"$releaseCgiUrl" );
+				$configDb->insertConfigValue( "$releaseId", "downloadUrl",
+					"$downloadUrl" );
+				$configDb->insertConfigValue( "$releaseId", "pathIndexHtmlDir",
+					"$pathIndexHtmlDir" );
+
+				# create release db + writeout codes
+				$releaseDb->createReleaseDataBase();
+				$releaseDb->fillReleaseDataBaseWithNewCodes($codeCount);
+				$template = $self->load_tmpl("wizardReleaseCreated.tmpl");
+
+		   #				$template = $self->setupForm("wizardReleaseCreated.tmpl");
+			}
+
+			# delete temp values anyway
+			$tempDb->cleanTemporaryValues();
+
+			return $self->renderPage($template);
 		}
-
-		# delete temp values anyway
-		$tempDb->cleanTemporaryValues();
-
-		return $self->renderPage($template);
 	}
 }
 
@@ -325,6 +296,25 @@ sub cgiapp_postrun {
 	my $self       = shift;
 	my $output_ref = shift;
 
+}
+
+# handle upload from html form to server
+sub uploadFile {
+	my $self = shift;
+
+	my $fileDir  = $self->getFileDir;
+	my $fileName = $self->getFileName;
+
+	my $query            = $self->query();
+	my $uploadFileHandle = $query->upload('fileName');
+
+	open( UPLOADFILE, ">$fileDir/$fileName" ) or die "$!";
+	binmode UPLOADFILE;
+
+	while (<$uploadFileHandle>) {
+		print UPLOADFILE;
+	}
+	close UPLOADFILE;
 }
 
 sub writeForwardHtmlFile {
@@ -386,15 +376,15 @@ sub getCustomDir {
 	return $cgiParams{"customDir"};
 }
 
+sub getFileName {
+	my $self      = shift;
+	my %cgiParams = $self->getCgiParamsHash();
+	return $cgiParams{"fileName"};
+}
+
 sub getForwardButtonState {
 	my $self = shift;
 	return $self->param('forwardButtonState');
-}
-
-sub getRandomName {
-    my $self      = shift;
-    my %cgiParams = $self->getCgiParamsHash();
-    return $cgiParams{"randomDirName"};
 }
 
 sub setForwardButtonState {
@@ -404,26 +394,5 @@ sub setForwardButtonState {
 	$self->param( 'forwardButtonState', $selectedButton );
 }
 
-sub getFileUploadedFlag {
-	my $self      = shift;
-	my %cgiParams = $self->getCgiParamsHash();
-	return $cgiParams{'fileUploaded'};
-}
-
-sub getRandomDirName {
-    my $self         = shift;
-    my $forwarderDir = $configDb->getForwarderDir();
-
-    my $randomGen = MyFav::RandomNumberGenerator->new();
-    my $randomDirName;
-
-    do {
-        $randomDirName = $randomGen->generateSingleCode(4);
-    } until ( !$self->directoryExists("$forwarderDir/$randomDirName") );
-    
-    return ( $randomDirName);
-}
-
 
 1;
-
