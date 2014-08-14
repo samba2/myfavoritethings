@@ -1,0 +1,7 @@
+-new js folder
+-new release status property, old config files get automatically status "Online"
+- new jquery-ui css inside myfavCss
+- set release online/ offline/ expire
+
+
+sessions dir leert sich nicht?

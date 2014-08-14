@@ -1,0 +1,107 @@
+<div id=releaseStatusPage>
+
+<TMPL_IF NAME=RELEASENAMELOOP>
+<p>
+
+<form id='releaseSelectionForm' action="<TMPL_VAR NAME=SCRIPTNAME>">
+    <select name="releaseId">
+        <option value="">Select a release</option>
+        <option value="">-----------------------------------</option>
+        <TMPL_LOOP NAME="RELEASENAMELOOP">
+	      <option value="<TMPL_VAR NAME="RELEASEIDHASH">" ><TMPL_VAR NAME="RELEASENAME"></option>
+         </TMPL_LOOP>    
+    </select>
+</form>
+</p>
+<TMPL_ELSE>
+<p>
+No releases found in the database.
+</p>
+</TMPL_IF>
+
+<TMPL_IF NAME=RELEASEID>
+    <hr />
+    <p><h4>Release "<TMPL_VAR NAME=RELEASENAME>"</h4></p>
+    <p>
+        <table>
+        	<tr><td>Release name:</td><td><TMPL_VAR NAME=RELEASENAME></td></tr>
+        	<tr><td>Release ID:</td><td><span id="spanReleaseId"><TMPL_VAR NAME=RELEASEID></span></td></tr>
+            <tr><td>Status</td><td id='releaseStatus'><TMPL_VAR NAME=STATUS></td></tr>
+        	<tr><td>Codes used:</td><td><TMPL_VAR NAME=USEDCODES> of <TMPL_VAR NAME=TOTALCODES></td></tr>
+        
+        	<TMPL_IF NAME="UPLOADFILESIZE">
+        	    <tr><td>Size of uploaded file:</td><td><TMPL_VAR NAME=UPLOADFILESIZE>Bytes</td></tr>
+        	<TMPL_ELSE>
+        		<tr><td>File hasn't been uploaded</td>
+        		    <td>
+        			    <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=modifyFile&releaseId=<TMPL_VAR NAME=RELEASEID>">
+        				    Upload here
+        			    </a>
+        		    </td>
+        		</tr>	
+            </TMPL_IF>
+        </table>
+    </p>
+    <hr />
+    <p>
+        <a id="showDetails" href="#">Show details</a>
+        &nbsp; | &nbsp;
+        <TMPL_IF NAME="UPLOADFILEPATH">	
+        	<a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=modifyFile&releaseId=<TMPL_VAR NAME=RELEASEID>">
+        		Replace Uploaded File
+        	</a>
+        <TMPL_ELSE>
+            <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=modifyFile&releaseId=<TMPL_VAR NAME=RELEASEID>">
+                Add File
+            </a>
+        </TMPL_IF>
+        &nbsp; | &nbsp;
+        <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=exportToPdf&releaseId=<TMPL_VAR NAME=RELEASEID>">Export Download-Vouchers</a>
+        &nbsp; | &nbsp;
+        <a href="<TMPL_VAR NAME=SCRIPTNAME>?rm=exportToCsv&releaseId=<TMPL_VAR NAME=RELEASEID>">Export CSV-File</a>
+        &nbsp; | &nbsp;
+        <a id="checkCodeStatus" href="#">Check Code Status</a>
+        &nbsp; | &nbsp;
+        <a id="deleteRelease" href="#">Delete Release</a>
+        &nbsp; | &nbsp;
+        <a id="changeReleaseStatus" href="#">Change Release Status</a>
+        &nbsp; | &nbsp;
+        <a id="editVoucher" href="#">Edit Voucher</a>
+
+
+    </p>
+</TMPL_IF>
+
+<!-- Include Dialog Boxes -->
+<TMPL_INCLUDE NAME="releasesDialogExtraInformation.tmpl">
+<TMPL_INCLUDE NAME="releasesDialogChangeReleaseStatus.tmpl">
+<TMPL_INCLUDE NAME="releasesDialogEditVoucher.tmpl">   
+<TMPL_INCLUDE NAME="releasesDialogDeleteRelease.tmpl"> 
+<TMPL_INCLUDE NAME="releasesDialogCheckCodeStatus.tmpl">
+
+ <script>
+ $(document).ready(function(){  
+ 
+    // hide dialog divs
+ 	$('#dialogExtraInformation').hide();
+    $('#dialogChangeReleaseStatus').hide();
+    $('#dialogEditVoucher').hide();
+    $('#dialogDeleteRelease').hide();
+    $('#dialogCheckCodeStatus').hide();
+    
+    // open release on select
+    $('#releaseSelectionForm').change(function(){
+        if ($('#releaseSelectionForm :selected').val()) {
+            $(this).submit();
+        }
+    }); 
+    
+    // Include Javascript logic for dialog boxes
+    <TMPL_INCLUDE NAME="releasesDialogCheckCodeStatus.js">	
+    <TMPL_INCLUDE NAME="releasesDialogChangeReleaseStatus.js">
+    <TMPL_INCLUDE NAME="releasesDialogEditVoucher.js">
+    <TMPL_INCLUDE NAME="releasesDialogDeleteRelease.js">
+    <TMPL_INCLUDE NAME="releasesDialogExtraInformation.js">
+
+ })
+ </script>

@@ -1,0 +1,68 @@
+<div id=wizardUploadZipFile>
+    <TMPL_IF NAME="UPLOAD_CHOOSER">
+        <table>
+            <tr>
+                <td>
+                    <input type="radio" name="uploadChooser" id="uploadNow" checked=1>
+                </td>
+                <td>
+                    Upload Now
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="radio" name="uploadChooser" id="uploadLater">
+                </td>
+                <td>
+                    Upload Later
+                </td>
+            </tr>
+        </table>
+        <p/>
+		
+		<div id="nextButton">
+            <form enctype='multipart/form-data' name="nextButton" action=<TMPL_VAR NAME=SCRIPTNAME>>
+			    <input type="submit" value="Next" />
+				<input type="hidden" name="rm" value="wizardReleaseCreated" />
+                <input type="hidden" name="fileUploaded" value="false" />
+            </form>
+			<p/>
+			<blockquote>
+			You can create a new release without uploading now. This might be usefull if you need to create the download vouchers earlier. To add the archive data later, got to "Manage Releases" and "Add Archive".<br>
+			Please note: The user download will stay disabled as long as there has no archive file been added.  
+			</blockquote>
+		</div>
+		<p/>
+    </TMPL_IF>
+
+    <div id="fileUploadDialog">
+        <form id="uploadForm" name="fileUpload" method="POST" enctype='multipart/form-data' action="<TMPL_VAR NAME=SCRIPTNAME>" >
+            <p>
+                Please select the ZIP file containing the packed MP3 files
+            </p>
+            <p>
+                <input id="fileName" name="fileName" type="file" size="20" />
+
+                <p class=highlight>
+                    <TMPL_VAR NAME=ERRORMESSAGE>
+                </p>
+                <iframe style="" id="uploadFrame" name="uploadFrame" width="400" height="35" frameborder="0" border="0" src="RPC.cgi?rm=sendUploadProgressIframeContent" scrolling="No" scrollbar="no"> </iframe>
+                <p>
+                    <input type="submit" id="submitButton" name="submitButton" disabled="disabled" value="Upload" />
+                </p>
+				<input type="hidden" name="rm" value="<TMPL_VAR NAME=NEXTRUNMODE>" />
+				<input type="hidden" name="releaseId" value="<TMPL_VAR NAME=RELEASEID>" />
+				<input type="hidden" name="fileUploaded" value="true" />
+                </form>
+            </p>
+            <br>
+            <blockquote>
+                <p>
+                    Please note, the maximum upload size is <TMPL_VAR NAME=MAXALLOWEDSIZE>.
+                </p>
+            </blockquote>
+       </div>
+
+ <script>
+    <TMPL_INCLUDE NAME="wizardUploadZipFile.js">
+</script>

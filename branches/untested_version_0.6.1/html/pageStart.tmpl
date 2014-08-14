@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title><TMPL_VAR NAME=VERSIONID></title>
+<link href="<TMPL_VAR NAME=WEB_LIB_PATH>/css/yaml_layout/my_layout.css" rel="stylesheet" type="text/css" />
+<link href="<TMPL_VAR NAME=WEB_LIB_PATH>/css/myFavStyles.css" rel="stylesheet" type="text/css" />
+
+<TMPL_IF NAME=INTERNAL>   
+    <link href="<TMPL_VAR NAME=WEB_LIB_PATH>/css/myFav-jquery-theme/jquery-ui-1.8.13.custom.css" rel="stylesheet" type="text/css" />  
+</TMPL_IF> 
+
+</head>
+
+<body>
+
+<TMPL_IF NAME=INTERNAL>   
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/jquery-1.6.1.min.js" type="text/javascript"></script>
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/myFavScripts.js" type="text/javascript"></script>
+  <script src="<TMPL_VAR NAME=WEB_LIB_PATH>/js/jquery-ui-1.8.13.custom.min.js" type="text/javascript"></script>
+</TMPL_IF> 
+
+<div class="page_margins">
+    <div class="page">
+    <TMPL_IF NAME=INTERNAL>      
+        <div id="header">
+	       <h2>My Favorite Things</h2>
+	       <h5>The Opensource One-Time Downloader</h5>
+	   </div>
+    </TMPL_IF>
