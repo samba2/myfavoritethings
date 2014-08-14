@@ -88,12 +88,8 @@ sub createPdf {
 		"dataBaseDir"  => $baseClass->getDataBaseDir()
 	);
 
-	my $labelHeader = $configDb->getActiveLabelHeader($releaseId);
-	my $labelFooter = $configDb->getActiveLabelFooter($releaseId);
-	
-    my $voucherHeaderDisabled = $configDb->isVoucherHeaderDisabled($releaseId);
-    my $voucherFooterDisabled = $configDb->isVoucherFooterDisabled($releaseId);
-
+	my $labelHeader = $configDb->getLabelHeader();
+	my $labelFooter = $configDb->getLabelFooter();
 	my $versionId   = $configDb->getVersionId();
 	my $labelAd     = $configDb->getLabelAd() . " " . $versionId;
 	my $downloadUrl = $configDb->getDownloadUrl($releaseId);
@@ -127,21 +123,13 @@ sub createPdf {
 	# height of one section is elements of array (lines -1) * lineSpacing
 	# no 'code' here since it is only one line
 	# (no seperate LineSpacing for 'Code' existing)
-	my $labelHeight = "";
-	
-	if ( ! $voucherHeaderDisabled) {
-	   $labelHeight = ($#headerArray) * $self->getLineSpacing('Header');    
-       $labelHeight += $self->getSectionSpacer('Medium');
-	}
+	my $labelHeight = ($#headerArray) * $self->getLineSpacing('Header');
+	$labelHeight += $self->getSectionSpacer('Medium');
 	$labelHeight += ($#urlArray) * $self->getLineSpacing('URL');
 	$labelHeight += $self->getSectionSpacer('Medium');
-    
-    if ( ! $voucherFooterDisabled ) {
-        $labelHeight += $self->getSectionSpacer('Medium');
-        $labelHeight += ($#footerArray) * $self->getLineSpacing('Footer');
-        $labelHeight += $self->getSectionSpacer('Medium');
-    }
-
+	$labelHeight += $self->getSectionSpacer('Medium');
+	$labelHeight += ($#footerArray) * $self->getLineSpacing('Footer');
+	$labelHeight += $self->getSectionSpacer('Medium');
 	$labelHeight += ($#adArray) * $self->getLineSpacing('Ad');
 
 	# lets start printing
@@ -186,13 +174,12 @@ sub createPdf {
 			$self->insertSectionSpacer('Large');
 		}
 
-        if ( ! $voucherHeaderDisabled ) {   
-    	    # main text
-    	    $self->printElement( 'Header', @headerArray );
-    
-    	    # space
-    	    $self->insertSectionSpacer('Medium');
-        }
+		# main text
+		$self->printElement( 'Header', @headerArray );
+
+		# space
+		$self->insertSectionSpacer('Medium');
+
 		# url
 		$self->printElement( 'URL', @urlArray );
 
@@ -201,14 +188,12 @@ sub createPdf {
 
 		# code
 		$self->printElement( 'Code', $downloadCode );
-		
-        if ( ! $voucherFooterDisabled ) {
-		    # space
-		    $self->insertSectionSpacer('Medium');
 
-		    # footers
-   	        $self->printElement( 'Footer', @footerArray );
-        }
+		# space
+		$self->insertSectionSpacer('Medium');
+
+		# footers
+		$self->printElement( 'Footer', @footerArray );
 
 		# space
 		$self->insertSectionSpacer('Small');

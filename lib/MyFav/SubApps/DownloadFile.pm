@@ -29,31 +29,23 @@ sub setup {
 		'downloadWelcomeScreen' => 'runModeDownloadWelcomeScreen',
 		'downloadStartDownload' => 'runModeDownloadStartDownload',
 		'streamFile'            => 'runModeStreamFile',
-		'rateLimitExceeded'     => $self->can('runModeRateLimitExceeded'),
-		'AUTOLOAD'              => $self->can('runModeDefault')
+		'rateLimitExceeded' => $self->can('runModeRateLimitExceeded'),
+		'AUTOLOAD'              =>  $self->can('runModeDefault')
 	);
 
 	my %cgiParams = $self->getCgiParamsHash();
 	$inputChecker = MyFav::CheckInput->new(%cgiParams);
-
+	
 	$configDb = $self->createConfigDbObject();
 	my $rateLimiter = $self->initRateLimiter();
 
 	# protect all oridnary runmodes  by rate limiter
-	$rateLimiter->protected_modes(
-		downloadWelcomeScreen => {
-			timeframe => $configDb->getRateLimiterTimeFrame(),
-			max_hits  => $configDb->getRateLimiterMaxHits()
-		},
-		downloadStartDownload => {
-			timeframe => $configDb->getRateLimiterTimeFrame(),
-			max_hits  => $configDb->getRateLimiterMaxHits()
-		},
-		streamFile => {
-			timeframe => $configDb->getRateLimiterTimeFrame(),
-			max_hits  => $configDb->getRateLimiterMaxHits()
-		}
-	);
+	$rateLimiter->protected_modes(downloadWelcomeScreen => {timeframe => $configDb->getRateLimiterTimeFrame(),
+                                          max_hits  => $configDb->getRateLimiterMaxHits()},
+                                    downloadStartDownload => {timeframe => $configDb->getRateLimiterTimeFrame(),
+                                          max_hits  => $configDb->getRateLimiterMaxHits()},
+                                    streamFile => {timeframe => $configDb->getRateLimiterTimeFrame(),
+                                          max_hits  => $configDb->getRateLimiterMaxHits()});
 }
 
 sub runModeDownloadWelcomeScreen {
@@ -62,45 +54,18 @@ sub runModeDownloadWelcomeScreen {
 	my $template;
 
 	# try to present download form
-	# die "" = die without a special warning, prevents CGI::Carp warnings
+	# die "" = die without a special warning, prevents CGI::Carp warnings 
 	eval {
 		my $releaseIdHash = $self->getHashedReleaseId() or die "";
-		my $releaseId     = $self->getSaveReleaseId()   or die "";
-		if ( !$releaseId ) { die "" }
-    	my $releaseName = $configDb->getReleaseName($releaseId) or die "";
-        my $currentUploadFilePath = $configDb->getUploadFilePath($releaseId) or die "";
-        my $status = $configDb->getStatus($releaseId) or die "";
+		my $releaseId = $self->getSaveReleaseId() or die "";
+		if (! $releaseId) {die ""}
+		my $releaseName = $configDb->getReleaseName($releaseId) or die "";
 
-        my $statusIsExpiryDate = $self->isAnExpiryDate($status);
-
-        if ( $statusIsExpiryDate ) {
-            if ( ! $self->isValidExpiryDate($status) ) {
-                $status = "Expired";
-                $statusIsExpiryDate = 0;
-                my $configDb = $self->createConfigDbObject();
-                $configDb->updateStatus($releaseId, $status);
-            }
-        }
-
-        if ( $status eq "Online" || $statusIsExpiryDate ) {
-            $template = $self->load_tmpl("downloadInputCode.tmpl");
-            $template->param( "SCRIPTNAME"   => $self->getCgiScriptName );
-            $template->param( "ERRORMESSAGE" => $errorMsg );
-            $template->param( "RELEASENAME"  => $releaseName );
-            $template->param( "R"            => $releaseIdHash );
-        }
-		else {
-            $template = $self->load_tmpl("downloadNotAvailable.tmpl");
-            if ( $status eq "File missing") {
-                $template->param( "FILE_MISSING"   => 1 );                
-            }
-            elsif ( $status eq "Offline") {
-                $template->param( "OFFLINE"   => 1 );
-            }
-            elsif ( $status eq "Expired" ) {
-                $template->param( "EXPIRED"   => 1 );
-            }
-		}
+		$template = $self->load_tmpl("downloadInputCode.tmpl");
+		$template->param( "SCRIPTNAME"   => $self->getCgiScriptName );
+		$template->param( "ERRORMESSAGE" => $errorMsg );
+		$template->param( "RELEASENAME"  => $releaseName );
+		$template->param( "R"            => $releaseIdHash );
 	};
 
 	# catch exception, display default page
@@ -117,9 +82,9 @@ sub runModeDownloadStartDownload {
 	my $error;
 	my $template;
 
-	my $downloadCode = $self->getDownloadCode();
-	my $releaseId    = $self->getSaveReleaseId();
-	if ( !$releaseId ) {
+	my $downloadCode  = $self->getDownloadCode();
+	my $releaseId = $self->getSaveReleaseId();
+	if (! $releaseId) {
 		return $self->runModeDownloadWelcomeScreen();
 	}
 
@@ -138,7 +103,7 @@ sub runModeDownloadStartDownload {
 		$self->runModeDownloadWelcomeScreen($error);
 	}
 	elsif ( $releaseDb->codeIsUsed($downloadCode)
-		&& !$self->codeIsInsideDownloadTimeFrame( $releaseId, $downloadCode ) )
+		&& !$self->codeIsInsideDownloadTimeFrame($releaseId, $downloadCode) )
 	{
 		$error = "The code you have entered has expired.";
 		$self->runModeDownloadWelcomeScreen($error);
@@ -153,17 +118,17 @@ sub runModeStreamFile {
 	my $self = shift;
 
 	my $downloadCode = $self->getDownloadCode();
-	my $releaseId    = $self->getSaveReleaseId();
-	if ( !$releaseId ) {
+	my $releaseId = $self->getSaveReleaseId();
+	if (! $releaseId) {
 		return $self->runModeDownloadWelcomeScreen();
 	}
-
+	
 	$releaseDb = $self->getReleaseDb($releaseId);
 
 	# only allow file streaming if code was set to "used" before and
 	# if the code is inside the time frame
 	if (   $releaseDb->codeIsUsed($downloadCode)
-		&& $self->codeIsInsideDownloadTimeFrame( $releaseId, $downloadCode ) )
+		&& $self->codeIsInsideDownloadTimeFrame($releaseId, $downloadCode) )
 	{
 		my $zipFilePath = $configDb->getUploadFilePath($releaseId);
 
@@ -184,11 +149,10 @@ sub displayDownloadAllowedPage {
 		$userAgent );
 
 	my $releaseIdHash = $self->getHashedReleaseId();
-
 	# escaping to let the browser deal with special characters
 	$releaseIdHash = $self->getEscapedValue($releaseIdHash);
-
-	my $template = $self->load_tmpl("downloadAllowed.tmpl");
+	
+	my $template      = $self->load_tmpl("downloadAllowed.tmpl");
 
 	$template->param( "SCRIPTNAME"    => $self->getCgiScriptName );
 	$template->param( "RELEASEIDHASH" => $releaseIdHash );
@@ -196,6 +160,7 @@ sub displayDownloadAllowedPage {
 
 	return $self->renderPage( $template, "pageIsPublic" );
 }
+
 
 sub getSaveReleaseId {
 	my $self = shift;
@@ -209,7 +174,7 @@ sub getSaveReleaseId {
 	};
 
 	# only return value if no exception took place
-	if ( !$@ ) {
+	if (! $@) {
 		return $releaseId;
 	}
 }

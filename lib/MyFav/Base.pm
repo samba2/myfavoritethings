@@ -12,8 +12,6 @@ use CGI::Application::Plugin::Session; # local
 use CGI::Application::Plugin::Redirect;  #local
 use MIME::Base64;  # core 
 use File::Basename;  # core
-use File::Spec; # core
-
 
 use base 'CGI::Application';
 
@@ -26,11 +24,10 @@ use CGI::Application::Plugin::RateLimit;
 # constants
 my $dataBaseDir = "../data";
 my $templatePath = '../html';
-my $webLibPath = '../myfavLibs';
+my $cssPath = '../myfavCss';
 my $fileDir = "../upload_files";
 my $sessionDir = "../sessions";
 my $releaseDbPrefix = 'codes_for_';  # prefix for releaseDb csv files, prevents non-alphanum. start of file
-my $uploadStatusFilePrefix = 'myfav_upload_status_';
 
 # implements login for admin modules like releases.pm and wizard.pm
 sub cgiapp_prerun {
@@ -55,7 +52,6 @@ sub cgiapp_prerun {
 # Special Run Modes
 ##############################################
 
-# disaplyed if runmode supplied by client could not be detected
 sub runModeDefault {
 	return "Welcome to the end of the world. Its going to be really scarry out here."
 }
@@ -159,34 +155,6 @@ sub getCgiParamsHash {
 	return %cgiParams;
 }
 
-sub getReleaseId {
-    my $self = shift;
-
-    my $cgi = $self->query();
-    return $cgi->param("releaseId");
-}
-
-sub getDownloadCode {
-    my $self = shift;
-
-    my $cgi = $self->query();
-    return $cgi->param("downloadCode");
-}
-
-sub getFileName {
-    my $self      = shift;
-    my %cgiParams = $self->getCgiParamsHash();
-    return $cgiParams{"fileName"};
-}
-
-# read session id from server environment, 
-# example session id var:
-# HTTP_COOKIE='CGISESSID=f27fd67467a3dd27086021ff6a5926b9'
-sub getSessionId {
-    ( my $sessionId ) = $ENV{'HTTP_COOKIE'} =~ 'CGISESSID=([0-9a-z]+)';
-
-    return "$sessionId"; 
-}
 
 ##############################################
 # Methods dealing with template data
@@ -204,10 +172,10 @@ sub renderPage {
 
 	my $startTmpl = $self->load_tmpl("pageStart.tmpl");
 	$startTmpl->param( "VERSIONID" => $configDb->getVersionId() );
-	$startTmpl->param( "WEB_LIB_PATH"   => $configDb->getWebLibBaseUrl() );
+	$startTmpl->param( "CSSPATH"   => $configDb->getCssPath() );
 	
 	if (! $isPublic) {
-		$startTmpl->param( "INTERNAL"   => "1" );
+		$startTmpl->param( "DISPLAYHEADER"   => "1" );
 	}
 
 	my $menuTmpl = $self->load_tmpl("pageMenu.tmpl");
@@ -305,55 +273,6 @@ sub getUnescapedValue {
 	return $unEscapedvalue;
 }
 
-sub getDateHash {
-    my $self = shift;
-    my $dateString = shift;
-
-    if ( $dateString =~ m/\A(\d\d)(\d\d)(\d\d\d\d)\Z/) {
-        my %dateHash  = (
-            "month" => $1,
-            "day" => $2,
-            "year" => $3);
-         return \%dateHash;   
-    }       
-}
-
-sub isAnExpiryDate {
-    my $self = shift;
-    my $dateString = shift;
-    
-    if ($dateString =~ m/\A\d{8}\Z/) {
-        return 1
-    }
-    else {
-        return 0
-    }
-}
-
-# only allow date if it is in range now <= date <= (date + approx. 500 years) 
-sub isValidExpiryDate {
-    my $self = shift;
-    my $date = shift;
-    my $validUntilYears = 500;
-    
-    my $dateHashRef = $self->getDateHash($date);  
-
-    my $nowEpoch = time();
-
-    # add seconds for 500 years to now, ignore leap years
-    my $maxEpochTime = $nowEpoch + $validUntilYears * 365 * 24 * 60 * 60;         
-
-    my $dateEpochTime;
-    eval {
-        $dateEpochTime = timelocal(00 ,00 ,00 ,$$dateHashRef{'day'} ,$$dateHashRef{'month'}-1, $$dateHashRef{year});
-    };
-
-    if ($nowEpoch < $dateEpochTime && $maxEpochTime > $dateEpochTime) {
-        return 1;
-    }       
-
-    return 0;
-} 
 
 ##############################################
 # Setup and Init methods
@@ -424,13 +343,6 @@ sub createConfigDbObject {
 	return $configDb;	
 }
 
-sub getInputChecker {
-    my $self = shift;
-
-    my %cgiParams = $self->getCgiParamsHash();
-    return MyFav::CheckInput->new(%cgiParams);
-}
-
 
 ##############################################
 # File access methods
@@ -458,10 +370,6 @@ sub directoryExists {
 	else {
 		return 0
 	}	
-}
-
-sub getTempDir {
-    return File::Spec->tmpdir();
 }
 
 ##############################################
@@ -532,52 +440,6 @@ sub codeIsInsideDownloadTimeFrame {
 	}
 }
 
-# handle upload from html form to server
-# at this point the file is already on the server, CGI.pm keeps
-# it in a temp file. so this is actual writing from CGI.pm temp space to
-# the upload destination
-sub uploadFile {
-    my $self = shift;
-
-    my $fileDir  = $self->getFileDir();
-    my $fileName = $self->getFileName();
-
-    my $query            = $self->query();
-    my $uploadFileHandle = $query->upload('fileName');
-
-    open( UPLOADFILE, ">$fileDir/$fileName" ) or die "$!";
-    binmode UPLOADFILE;
-
-    while (<$uploadFileHandle>) {
-        print UPLOADFILE;
-    }
-    close UPLOADFILE;
-}
-
-sub getUploadStatusFilePath {
-    my $self = shift;
-
-    my $sessionId = $self->getSessionId();
-    my $tmpDir = $self->getTempDir();
-    my $uploadFileprefix = $self->getUploadStatusFilePrefix();
-    
-    return "$tmpDir/$uploadFileprefix$sessionId";
-}
-
-sub uploadCgiHook {
-    my ($fileName, undef, $bytesRead, undef) = @_;
-
-    my $baseClass = MyFav::Base->new();
-    my $totalBytes = $baseClass->getCgiContentLength();
-    my $bytesReadPercent = ( $bytesRead * 100 ) / $totalBytes;
-
-    my $uploadStatusFileName = $baseClass->getUploadStatusFilePath();
-
-    open (FH,">$uploadStatusFileName");
-    printf FH ("{\"uploadStatus\": %d}", $bytesReadPercent );    
-    close FH;
-}
-
 ##############################################
 # Getter for constants
 ##############################################
@@ -590,8 +452,8 @@ sub getTemplatePath {
 	return $templatePath;
 }
 
-sub getWebLibPath {
-    return $webLibPath;
+sub getCssPath {
+    return $cssPath;
 }
 
 sub getFileDir {
@@ -605,12 +467,6 @@ sub getSessionDir {
 sub getReleaseDbPrefix {
 	return $releaseDbPrefix;
 }
-
-sub getUploadStatusFilePrefix {
-    return $uploadStatusFilePrefix
-;
-}
-
 
 
 1;

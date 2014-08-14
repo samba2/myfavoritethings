@@ -2,11 +2,9 @@ package MyFav::CheckInput;
 
 use strict;
 use CGI::Carp qw ( fatalsToBrowser );  
-use Time::Local;
 
 use MyFav::DB::ConfigDB;
 use MyFav::Base;
-
 use Number::Bytes::Human qw(format_bytes);
 
 my $textAllowedCharacters =
@@ -142,7 +140,6 @@ sub checkWizardCustomForwardDir {
 
 sub checkWizardUploadFile {
 	my $self     = shift;
-    
 	my $fileName = $self->getFileName();
 	my $error;
 	
@@ -165,8 +162,8 @@ sub checkWizardUploadFile {
 	elsif ($contentLength > $maximumUploadFileSize) {
 		$error = "The file you have uploaded exeeds the maximum of $maxAllowedSizeFormated allowed. Your file size is $contentLengthFormated.";
 	}
-    elsif ( $baseClass->fileExists($uploadFile)) {
-        $error = sprintf("The file '%s' is already existing on the server. Please rename your upload file.", $uploadFile);
+	elsif ( $baseClass->fileExists($uploadFile)) {
+		$error = sprintf("The file '%s' is already existing on the server. Please rename your upload file.", $uploadFile);
 	}
 	
 	return $error;
@@ -262,6 +259,7 @@ sub checkDownloadCode {
 	return $error;
 }
 
+
 sub hasValidCharacters {
 	my $self       = shift;
 	my $testString = shift;
@@ -297,6 +295,7 @@ sub isValidDirectoryName {
 		return 0;
 	}
 }
+
 
 
 sub containsWhiteSpace {

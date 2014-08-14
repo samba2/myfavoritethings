@@ -1,35 +1,62 @@
 
-sub testWizard {
-	$mech->get_ok("$cgiBinUrl/Releases.cgi");
+sub testWizardAndLogin {
+	
+	# test wrong login	
+	$mech->content_contains("enter your login password");
+	$mech->submit_form_ok( { fields => { loginPassword => "wrong login" } },
+			"send wrong login" );
+	$mech->content_contains("Password was not correct");
 
-	# login
+
+	# EXCEED RATE LIMITER
+	# delete old rate limiter data
+	system("rm -f $csvPath/rate_limit_hits.csv");
+
+	my $configDb = MyFav::DB::ConfigDB->new(
+		"dataBaseName" => "config",
+		"dataBaseDir"  => $baseClass->getDataBaseDir()
+	);
+	my $rateLimterMax = $configDb->getRateLimiterMaxHits();
+	
+	# send rate limiter maximum on wrong logins...
+	for ($i=0; $i<=$rateLimterMax; $i++) {
+		$mech->submit_form_ok( { fields => { loginPassword => "wrong login" } },
+			"send wrong login" );
+	}
+	# ..and expect the rate limiter message
+	$mech->content_contains("accessed this page too often");
+
+	# delete rate limiter data to continue testing
+	system("rm -f $csvPath/rate_limit_hits.csv");
+
+	# we exceeded the limiter, so lets start from new by accessing
+	# the Releases.cgi
+	$mech->get_ok("$cgiBinUrl/Releases.cgi");
+	$mech->content_contains("enter your login password");
+
+	$mech->submit_form_ok(
+		{ fields => { loginPassword => "123456789012345678901" } },
+		"pw too long" );
+	$mech->content_contains("too long");
+
+	# correct login
 	$mech->submit_form_ok( { fields => { loginPassword => "$currentPw" } },
-		"login to create new release" );
+		"send correct login" );
 
 	# test Wizard.pm
-	
-	# create this two releases + delete them after the test
-    print "ok Release upload + deleting\n";
-    createRelease( "maiktestId2", "maiktestName2", "maik4.zip", 1 );
-    print "ok Release without upload + deleting\n";
-    createRelease( "maiktestId3", "maiktestName3", "fake", 1 );
-	
-	# "myfavTestId" is kept for further tests
 	createRelease( "myfavTestId",  "myfavTestName",  "maik.zip" );
-
-	# logout
-	$mech->follow_link_ok( { text => "Logout" }, "logging out" );
-	$mech->content_contains("Please enter your login password");
+	createRelease( "secondTestId", "secondTestName", "maik2.zip" );
+##	createRelease( "thirdTestId",  "butGoodrelease", "maik3.zip" )
 }
 
+
 sub createRelease {
-	my $releaseId     = shift;
-	my $releaseName   = shift;
-	my $testZip       = shift;
-	my $deleteRelease = shift;
+	my $releaseId   = shift;
+	my $releaseName = shift;
+	my $testZip     = shift;
 
 	# first page, release name + id
-	$mech->follow_link_ok( { text => "Add new Release" }, "open wizard" );
+    $mech->follow_link_ok({text => "Add new Release"}, "open wizard" );
 	$mech->title_like(qr/My Favorite Things/);
 	$mech->content_contains("Please enter the title of the release:");
 
@@ -93,74 +120,27 @@ sub createRelease {
 	$mech->submit_form_ok( { fields => { forwarder => "randomString" } } );
 
 	# 4. page, upload zip file
-	# distinguishes between existing $testZip = upload and
-	# non existing $testZip = upload later
-
 	$mech->content_contains(
 		"Please select the ZIP file containing the packed MP3");
-
+	
 	# upload 201M file - too big
 	# test afterwards fails if enabled. works in real though...
-	#	$mech->submit_form_ok( { fields => { 'fileName' => "201MBFile.zip"} } );
-	#	$mech->content_contains("exeeds the maximum");
-
-    # finish wizard with file upload
-	if ( -r $testZip ) {
-
-		# simulate an existing file
-		system("touch $uploadPath/$testZip");
-
-		$mech->submit_form_ok(
-			{
-				form_name => 'fileUpload',
-				fields    => { 'fileName' => $testZip }
-			}
-		);
-		$mech->content_contains("already existing on the server");
-
-		# delete upload file
-		system("rm -f $uploadPath/$testZip");
-		$mech->submit_form_ok(
-			{
-				form_name => 'fileUpload',
-				fields    => { 'fileName' => "$testZip" }
-			},
-			"normal file upload"
-		);
-
-	}
-	# finish wizard without fileupload
-	else {
-		$mech->submit_form_ok(
-			{
-				form_name => 'nextButton'
-			}
-		);
-
-	}
+#	$mech->submit_form_ok( { fields => { 'fileName' => "201MBFile.zip"} } );
+#	$mech->content_contains("exeeds the maximum");
+	
+	# simulate an existing file
+	system("touch $uploadPath/$testZip");
+	$mech->submit_form_ok( { fields => { 'fileName' => $testZip } } );
+	$mech->content_contains("already existing on the server");
+	# delete upload file
+	system("rm -f $uploadPath/$testZip");
+	$mech->submit_form_ok( { fields => { 'fileName' => "$testZip" } }, "normal file upload" );
 
 	# wizard finished
 	$mech->content_contains("Finished!");
-	
-    # test if user download page in inactive if no file has been added
-	if (! -r $testZip) {
-        my $configDb = MyFav::DB::ConfigDB->new(
-            "dataBaseName" => "config",
-            "dataBaseDir"  => $baseClass->getDataBaseDir()
-        );
-        
-        my $releaseCgiUrl = $configDb->getReleaseCgiUrl($releaseId);
-        $mech->get_ok($releaseCgiUrl);
-        
-        print "Testing if download page is inactive\n";
-        $mech->content_contains("There has no music been added");
-        
-        $mech->get_ok("$cgiBinUrl/Releases.cgi");
-	}
-	
 
 	# try to add myfavTestName again
-	$mech->follow_link_ok( { text => "Add new Release" }, "re-open wizard" );
+	$mech->follow_link_ok({text => "Add new Release"}, "re-open wizard" );
 	$mech->title_like(qr/My Favorite Things/);
 	$mech->content_contains("Please enter the title of the release:");
 	$mech->submit_form_ok(
@@ -171,70 +151,6 @@ sub createRelease {
 		"Send form data"
 	);
 	$mech->content_contains("choose a different release ID");
-
-    # testing adding/ replacing files in Releases.pm
-    $mech->follow_link_ok( { text => "Manage Releases" }, "open releases" );
-    $mech->content_contains("Select a release");
-    $mech->content_contains($releaseName);
-
-    # select $releaseName
-    $mech->submit_form_ok( { fields => { releaseId => $releaseName } },
-            "Select a release" );
-
-    if ( $mech->content() =~ m/File hasn't been uploaded/ig ) {
-        $mech->follow_link_ok( { text => "Add File" }, "testing adding upload file" );	
-    }
-    else {
-    	$mech->follow_link_ok( { text => "Replace Uploaded File" }, "testing replacing of uploaded file" );
-    }    
-
-    # simulate an existing file
-    system("touch $uploadPath/wizardAddFileTest.zip");
-
-    $mech->submit_form_ok(
-        {
-            form_name => 'fileUpload',
-            fields    => { 'fileName' => "wizardAddFileTest.zip" }
-        }
-    );
-    $mech->content_contains("already existing on the server");
-
-    # delete upload file
-    system("rm -f $uploadPath/wizardAddFileTest.zip");
-        
-    $mech->submit_form_ok(
-        {
-            form_name => 'fileUpload',
-            fields    => { 'fileName' => "wizardAddFileTest.zip" }
-        },
-        "add file upload"
-    );
-    $mech->content_contains("Size of uploaded file");
-    
-
-  	# only for single tests with Wizard.pm
-	if ($deleteRelease) {
-
-		# delete the release
-		$mech->follow_link_ok( { text => "Manage Releases" }, "open releases" );
-		$mech->content_contains("Select a release");
-		$mech->content_contains($releaseName);
-		$mech->content_contains("http");
-
-		# select $releaseName
-		$mech->submit_form_ok( { fields => { releaseId => $releaseName } },
-			"Select a release" );
-		$mech->content_contains("Public download URL");
-
-		# delete release dialog
-		$mech->follow_link_ok( { text => "Delete Release" },
-			"request deleting release" );
-		$mech->content_contains("Do you really want to");
-
-		# delete release + go to default page
-		$mech->follow_link_ok( { text => "Yes" }, "accept deleting release" );
-		$mech->content_unlike( qr/Could not delete/, "no delete error" );
-	}
 }
 
 1;

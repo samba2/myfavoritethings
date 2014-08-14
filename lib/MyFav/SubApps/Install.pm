@@ -10,9 +10,8 @@ use File::Copy::Recursive qw ( dircopy );
 use CGI::Application::Plugin::Redirect;
 use Exception::Class('MyFav::Install::ChmodFailed',
                      'MyFav::Install::UrlNotAccessible',
-                     'MyFav::Install::WebLibCopyFailed',
-                     'MyFav::Install::WebLibNotAccessible',
-                     'MyFav::Install::NoDeleteInWebLibs',
+                     'MyFav::Install::CssCopyFailed',
+                     'MyFav::Install::CssNotAccessible',
                      'MyFav::Install::CantCreateForwarderPath',
                      'MyFav::Install::NoAccessToForwarderUrl',
                      'MyFav::Install::NoWriteInForwarderPath'
@@ -30,6 +29,7 @@ my %forwardDirSuggestions = (
 	6 => "myfav",
 	7 => "qayx"
 );
+
 
 # overwrite method from MyFav::Base
 sub cgiapp_prerun { }
@@ -55,7 +55,7 @@ sub runModeStartInstall {
 	my $errorMsg = shift;
 	my $suggestion;
 	my $forwarderPath;
-	my $webLibDir  = "myfavLibs";
+	my $cssDir  = "myfavCss";
 	my $baseUrl = $self->getBaseUrl();
 
 	my $template = $self->load_tmpl("installer.tmpl");
@@ -80,7 +80,9 @@ sub runModeStartInstall {
 	$template->param( "FORWARDERDIR" => $suggestion );
 	$template->param( "BASEURL" => $baseUrl );
 
-	$template->param( "WEB_LIB_DIR"  => $webLibDir );
+	my $cssPath = $documentRoot . "/" . $cssDir;
+	$template->param( "CSSPATH" => $cssPath );
+	$template->param( "CSSDIR"  => $cssDir );
 	$template->param( "DOCROOT" => $documentRoot );
 
 	return $template->output;
@@ -94,11 +96,11 @@ sub runModeProcessInstall {
 	my $error        = $inputChecker->checkGeneralPasswordChange();
 
 	my $forwarderDir = $self->getForwarderDir();
-	my $webLibDir       = $self->getWebLibDir();
+	my $cssDir       = $self->getCssDir();
 	my $documentRoot = $self->getCgiDocumentRoot();
 
 	my $forwarderPath = $documentRoot . "/" . $forwarderDir;
-	my $webLibPath       = $documentRoot . "/" . $webLibDir;
+	my $cssPath       = $documentRoot . "/" . $cssDir;
 
 	if ($error) {
 		return $self->runModeStartInstall($error);
@@ -110,43 +112,39 @@ sub runModeProcessInstall {
 		);
 	}
 
-	elsif ( $self->fileOrDirExists($webLibPath) ) {
+	elsif ( $self->fileOrDirExists($cssPath) ) {
 		return $self->runModeStartInstall(
-"The directory '$webLibDir' is already existing. Choose a different one."
+"The style sheet directory '$cssDir' is already existing. Choose a different one."
 		);
 	}
 	# everything fine, carry out install tasks
 	else {
 		my $baseUrl      = $self->getBaseUrl();
-		my $webLibBaseUrl       = $baseUrl . "/" . $webLibDir;
+		my $cssUrl       = $baseUrl . "/" . $cssDir . '/css/my_layout.css';
 		my $forwarderUrl = $baseUrl . "/" . $forwarderDir;
 
 		my $cgiHttpPath = dirname( $self->getMyCurrentUrl() );
 
 		my $downloadCgiPath = $cgiHttpPath . "/DownloadFile.cgi";
 		my $loginCgiPath    = $cgiHttpPath . "/Login.cgi";
-		my $releasesCgiPath = $cgiHttpPath . "/Releases.cgi";
-		my $myfavLibSrc     = $self->getWebLibPath();
+		my $releasesCgiPath  = $cgiHttpPath . "/Releases.cgi";
+        my $cssSource = $self->getCssPath();
+
 
         my $template = $self->load_tmpl("installerAbort.tmpl");
 
 		eval {
 
-			# copy libs to www area + test accessiblity
-			dircopy( $myfavLibSrc , $webLibPath ) or MyFav::Install::WebLibCopyFailed->throw( error=>$! );
-            $self->writeTestFile("$webLibPath/test.txt");
-
-			unless ($self->urlAccessible("$webLibBaseUrl/")) {
-			    MyFav::Install::WebLibNotAccessible->throw();
+			# copy css to www area + test accessiblity
+			dircopy( $cssSource , $cssPath ) or MyFav::Install::CssCopyFailed->throw( error=>$! );
+			unless ($self->urlAccessible($cssUrl)) {
+			    MyFav::Install::CssNotAccessible->throw();
 			} 
-			
-			unlink "$webLibPath/test.txt"
-              or MyFav::Install::NoDeleteInWebLibs->throw();
 			
 			# create $forwarderPath, write a testfile inside, try to open it via
 			# a http call and delete test file afterwards
 			mkpath($forwarderPath) or MyFav::Install::CantCreateForwarderPath->throw( error=>$! );
-
+			;
 			$self->writeTestFile("$forwarderPath/test.txt");
 			$self->urlAccessible("$forwarderUrl/test.txt")
 			  or MyFav::Install::NoAccessToForwarderUrl->throw();
@@ -161,16 +159,16 @@ sub runModeProcessInstall {
         my $e = Exception::Class->caught();  
         
         if ( $e ) {
-            $template->param( "WEB_LIB_PATH" => $webLibPath);
+            $template->param( "CSS_PATH" => $cssPath);
             $template->param( "ERROR_DESC" => $e->error );
             
-            if ( $e = Exception::Class->caught('MyFav::Install::WebLibCopyFailed') ) {
-                $template->param( "WEB_LIB_COPY_FAILED" => "1" );
-                $template->param( "WEB_LIB_SOURCE"  => $myfavLibSrc );
+            if ( $e = Exception::Class->caught('MyFav::Install::CssCopyFailed') ) {
+                $template->param( "CSS_COPY_FAILED" => "1" );
+                $template->param( "CSS_SOURCE"  => $cssSource );
             }
-            elsif ($e = Exception::Class->caught('MyFav::Install::WebLibNotAccessible')) {
-                $template->param( "NO_WEB_ACCHESS" => "1" );
-                $template->param( "TEST_URL" => "$webLibPath/test.txt" );
+            elsif ($e = Exception::Class->caught('MyFav::Install::CssNotAccessible')) {
+                $template->param( "CSS_NOT_ACCESSIBLE" => "1" );
+                $template->param( "CSS_URL" => $cssUrl );
             }
             elsif ($e = Exception::Class->caught('MyFav::Install::CantCreateForwarderPath')) {
 
@@ -178,8 +176,8 @@ sub runModeProcessInstall {
                 $template->param( "FORWARDER_PATH" => $forwarderPath);
             }
             elsif ($e = Exception::Class->caught('MyFav::Install::NoAccessToForwarderUrl')) {
-                $template->param( "NO_WEB_ACCHESS" => "1" );  
-                $template->param( "TEST_URL" => "$forwarderUrl/test.txt" );                              
+                $template->param( "NO_ACCESS_TO_FORWARDER_URL" => "1" );  
+                $template->param( "FORWARDER_URL" => "$forwarderUrl/test.txt" );                              
             } 
             elsif ($e = Exception::Class->caught('MyFav::Install::NoWriteInForwarderPath')) {
                 $template->param( "NO_WRITE_IN_FORWARDER_PATH" => "1" );      
@@ -203,7 +201,7 @@ sub runModeProcessInstall {
 		$configDb->updateLoginCgiPath($loginCgiPath);
 		$configDb->updateForwarderDir($forwarderPath);
 		$configDb->updateDownloadDefaultPath($forwarderUrl);
-		$configDb->updateWebLibBaseUrl($webLibBaseUrl);
+		$configDb->updateCssPath($cssUrl);
 		
 		my $newPassword = $self->getNewPassword();
 		$newPassword = $self->getHashedValue($newPassword);
@@ -310,11 +308,11 @@ sub getForwarderDir {
 	return $cgi->param("forwarderDir");
 }
 
-sub getWebLibDir {
+sub getCssDir {
 	my $self = shift;
 
 	my $cgi = $self->query();
-	return $cgi->param("webLibDir");
+	return $cgi->param("cssDir");
 }
 
 sub getScriptFileName {

@@ -25,10 +25,11 @@
   <tr><td><p>Central Web Directory:</td><td><TMPL_VAR NAME=BASEURL>/<input type="text" size=20 maxlength=40 name="forwarderDir" value="<TMPL_VAR NAME=FORWARDERDIR>">/myExampleRelease</p></td></tr>
   <tr><td colspan=2><hr></td></tr>
   <tr><td colspan=2>
-    <p>This directory is used to store the several web library files (CSS and Javascript) employed by 'My Favorite Things'. You can leave this default or change it to your needs. Again, sub directories divided by a '/' are allowed.</p>
+    <p>'My Favorite Things' uses style sheets for its layout. The default location for them is the directory <i><TMPL_VAR NAME=CSSPATH></i>.
+    You can leave this default or change it to your needs. Again, sub directories divided by a '/' are allowed.</p>
 
   <tr><td colspan=2>&nbsp;</td></tr>
-  <tr><td>Web Library Directory:</td><td><TMPL_VAR NAME=DOCROOT>/<input type="text" size=20 maxlength=40 name="webLibDir" value="<TMPL_VAR NAME=WEB_LIB_DIR>"></td></tr>
+  <tr><td>Style Sheet Path:</td><td><TMPL_VAR NAME=DOCROOT>/<input type="text" size=20 maxlength=40 name="cssDir" value="<TMPL_VAR NAME=CSSDIR>"></td></tr>
   <tr><td colspan=2><hr></td></tr>
   <tr><td colspan=2><font color=red><TMPL_VAR NAME=ERRORMESSAGE></font></td></tr>
 </table>
