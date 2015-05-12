@@ -1,9 +1,11 @@
 ![http://myfavoritethings.googlecode.com/files/mainAdminScreen.png](http://myfavoritethings.googlecode.com/files/mainAdminScreen.png)
+
 _Main admin screen after login with one release opened_
 
 ---
 
 ![http://myfavoritethings.googlecode.com/files/examplePdfVouchers.png](http://myfavoritethings.googlecode.com/files/examplePdfVouchers.png)
+
 _Two example download vouchers, auto-generated and provided as PDF file_
 
 ---
