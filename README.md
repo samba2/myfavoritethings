@@ -2,7 +2,7 @@
 One Time Downloader for small record labels
 
 
-[Downloads](documentation/Downloads.md) | [Screenshots](documentation/ScreenShots.md) | [Installation](documentation/Installation.md) | [UserGuide](documentation/UserGuide.md) | [FrequentlyAskedQuestions](documentation/FrequentlyAskedQuestions.md) | [ChangeLog](documentation/ChangeLog.md) | [TechnicalDetails](documentation/TechnicalDetails.md) | [FutureWork](documentation/FutureWork.md)
+[Downloads](documentation/Downloads.md) | [Screenshots](documentation/ScreenShots.md) | [Installation](documentation/Installation.md) | [UserGuide](documentation/UserGuide.md) | [FrequentlyAskedQuestions](documentation/FrequentlyAskedQuestions.md) | [TechnicalDetails](documentation/TechnicalDetails.md) | [FutureWork](documentation/FutureWork.md)
 
 Provides small record labels with the ability to add a download voucher to their vinyl record releases. This download voucher contains an URL + a One time code to download the whole record as ZIP file containing MP3 files.
 
