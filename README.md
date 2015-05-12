@@ -10,8 +10,11 @@ The label owner can create new download projects and manage existing downloads b
 
 Watch the 18 Minutes Video Presentation and Software Demo [here](http://vimeo.com/15281130)
 
+**Update May 2015**
+Moved to github.com since Google Code is closing down.
+
 **Update August 2014**
-New version 0.5d which also supports Perl 5.18 in [Downloads](Downloads.md)
+New version 0.5d which also supports Perl 5.18 in [Downloads](documentation/Downloads.md)
 
 I'm doing some planning for a new realease. If you are currently missing a feature, this is the right time to contact me: maiktoepfer@googlemail.com
 
