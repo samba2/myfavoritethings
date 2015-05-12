@@ -9,6 +9,7 @@ _Two example download vouchers, auto-generated and provided as PDF file_
 ---
 
 ![http://myfavoritethings.googlecode.com/files/userDownloadExample.png](http://myfavoritethings.googlecode.com/files/userDownloadExample.png)
+
 _Download page the user (record owner with the voucher) is seeing_
 
 
