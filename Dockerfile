@@ -5,7 +5,7 @@ RUN apt-get update && \
 
 COPY cgi/ /usr/local/apache2/cgi-bin/MyFavoriteThings/cgi
 COPY html/ /usr/local/apache2/cgi-bin/MyFavoriteThings/html/
-COPY lib/ /usr/local/apache2/cgi-bin/MyFavoriteThings/lib/
+COPY lib/MyFav /usr/local/apache2/cgi-bin/MyFavoriteThings/lib/MyFav/
 COPY myfavCss/ /usr/local/apache2/cgi-bin/MyFavoriteThings/myfavCss/
 
 COPY dockerize/httpd.conf /usr/local/apache2/conf/httpd.conf
@@ -14,3 +14,6 @@ RUN chmod u+x /usr/local/apache2/cgi-bin/MyFavoriteThings/cgi/*
 
 HEALTHCHECK --interval=2s --timeout=2s --retries=3 \
   CMD curl --silent --fail localhost || exit 1
+
+# for tests only
+ENV PERL5LIB=/usr/local/apache2/cgi-bin/MyFavoriteThings/lib2

@@ -16,7 +16,13 @@ function block_until_available {
     printf "\n"
 }
 
-CONTAINER_ID=$(docker run --publish 80:80 --detach --rm myfavoritethings-test)
+# CONTAINER_ID=$(docker run --publish 80:80 --detach --rm myfavoritethings-test)
+CONTAINER_ID=$(docker run \
+    --publish 80:80 \
+    -v /home/maik/git/myfavoritethings/lib2/lib/perl5:/usr/local/apache2/cgi-bin/MyFavoriteThings/lib2 \
+    --detach \
+    --rm \
+    myfavoritethings-test)
 echo "Testcontainer running with id $CONTAINER_ID"
 block_until_available $CONTAINER_ID
 
