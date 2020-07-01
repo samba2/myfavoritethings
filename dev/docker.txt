@@ -1,0 +1,59 @@
+# Run Apache + Mount MyFav + Mount Config
+docker run -dit --name my-apache-app -p 8080:80 -v C:\Users\Maik\git\myfavoritethings:/usr/local/apache2/cgi-bin/MyFavoriteThings/ -v C:\Users\Maik\git\myfavoritethings\myhttpd.conf:/usr/local/apache2/conf/httpd.conf  httpd:2.4.25
+
+docker exec -it my-apache-app /bin/bash
+chmod u+x /usr/local/apache2/cgi-bin/MyFavoriteThings/cgi/*
+
+docker run -dit --name my-apache2 -p 8080:80 C:\Users\Maik\git\myfavoritethings\myhttpd.conf:/usr/local/apache2/conf/httpd.conf  httpd:2.4.25
+
+
+http://127.0.0.1:8080/cgi-bin/MyFavoriteThings/cgi/install.cgi
+
+
+
+
+docker logs my-apache-app
+
+docker stop my-apache-app
+docker rm my-apache-app
+
+
+commands:
+docker build -t myfavoritethings .
+docker run -it -p 80:80 myfavoritethings
+
+clean: docker stop $(docker ps -a -q); rm -rf /mnt/c/temp/htdocs/*
+
+external dirs:
+  -htdocs
+
+
+ We assume there is an existing installation
+
+
+ user is "daemon"
+
+http://127.0.0.1:8080/cgi-bin/MyFavoriteThings/cgi/Releases.cgi?releaseId=R1
+http://127.0.0.1/cgi-bin/MyFavoriteThings/cgi/install.cgi
+
+
+
+# first mount depends on the directory name chosen for the forward directory 
+# default was "downloads"
+docker run -it \
+    --publish 80:80 \
+    --volume "$(pwd)"/test/test_release/downloads:/usr/local/apache2/htdocs/downloads \
+    --volume "$(pwd)"/test/test_release/data:/usr/local/apache2/cgi-bin/MyFavoriteThings/data \
+    --volume "$(pwd)"/test/test_release/upload_files:/usr/local/apache2/cgi-bin/MyFavoriteThings/upload_files \
+    --env HOST_UID=${UID} \
+    myfavoritethings
+
+
+TODO: 
+- apache  have already created the file /usr/local/apache2/htdocs/music/.htaccess with the content 'Options -Indexes' for you. However, this has not resolved the issue! Please contact your web-server admin. 
+- certificates?
+
+- providing PW via hash
+echo "123456" | perl -MDigest::MD5=md5_base64 -e '$s=<>;chomp($s);print md5_base64($s);'
+
+
