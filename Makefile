@@ -1,18 +1,32 @@
+PERL_VERSION=perl-5.30.3
+
+CURRENT_DIR = $(shell pwd)
+export PERLBREW_ROOT=${CURRENT_DIR}/build/perlbrew
+PERL_DISTRIBUTION_DIR=${PERLBREW_ROOT}/perls/${PERL_VERSION}
+PERLBREW=${PERLBREW_ROOT}/bin/perlbrew
+CPANM=${PERLBREW_ROOT}/bin/cpanm
+
 container:
 	docker build -t myfavoritethings-test . 
 
+# https://metacpan.org/pod/Test::Class
 test:
 	test/installer_test.sh
 
-# TODO continue here
-# https://metacpan.org/pod/distribution/App-perlbrew/script/perlbrew
-# export PERLBREW_ROOT=/opt/perl5
-# curl -L http://install.perlbrew.pl | bash
-# After doing this, the perlbrew executable is installed as /opt/perl5/bin/perlbrew
-#
-# https://gist.github.com/jkeroes/5759286
-build_perl:
-	#myperl/bin/perlbrew -j 9 --notest install 5.26.0
+${PERLBREW}:
+	curl -L http://install.perlbrew.pl | bash
+
+${CPANM}: ${PERLBREW}
+	${PERLBREW} install-cpanm
+
+${PERL_DISTRIBUTION_DIR}: ${PERLBREW}
+	${PERLBREW} -j 9 --notest install ${PERL_VERSION}
+
+install_modules: ${PERL_DISTRIBUTION_DIR} ${CPANM}
+	${PERLBREW} exec -q --with ${PERL_VERSION} ${CPANM} --notest --installdeps .
+	
+
+
 
 
 download_libs2:
@@ -27,6 +41,7 @@ download_libs:
 	https://cpan.metacpan.org/authors/id/X/XS/XSAWYERX/Data-Dumper-2.173.tar.gz
 
 clean:
-	rm -rf lib2
+	# rm -rf lib2
+	rm -rf build
 
 .PHONY: test container	
