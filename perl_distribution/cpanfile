@@ -1,0 +1,14 @@
+requires 'CGI::Carp';
+requires 'DBI';
+requires 'DBD::AnyData';
+requires 'Data::Dumper';
+requires 'String::Random';
+requires 'URI::Escape';
+requires 'Date::Format';
+requires 'HTTP::Lite';
+requires 'CGI::Application::Plugin::Session';
+requires 'CGI::Application::Plugin::Redirect';
+requires 'CGI::Application::Plugin::RateLimit';
+requires 'Number::Bytes::Human';
+requires 'File::Copy::Recursive';
+requires 'Exception::Class';
