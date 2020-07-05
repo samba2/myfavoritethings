@@ -15,5 +15,3 @@ COPY myfavCss/ /usr/local/apache2/cgi-bin/MyFavoriteThings/myfavCss/
 COPY cgi/ /usr/local/apache2/cgi-bin/MyFavoriteThings/cgi
 
 RUN chmod u+x /usr/local/apache2/cgi-bin/MyFavoriteThings/cgi/*
-
-ENV PERL5LIB="/usr/local/apache2/cgi-bin/MyFavoriteThings/perl5/lib:/usr/local/apache2/cgi-bin/MyFavoriteThings/perl5/lib/site_perl/5.30.3/:/usr/local/apache2/cgi-bin/MyFavoriteThings/perl5/lib/site_perl/5.30.3/x86_64-linux/"

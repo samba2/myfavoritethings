@@ -1,4 +1,6 @@
 PERL_VERSION=perl-5.30.3
+PERL_VERSION_MODULE_DIR=5.30.3
+
 PERLBREW_ROOT=${PWD}/build/perlbrew
 
 perl_distribution_build_image:
@@ -24,6 +26,10 @@ perl_distribution: perl_distribution_build_image
 	# we need to sudo due to docker uid mapping
 	sudo rm -rf build/perl5 
 	cp -r ${PERLBREW_ROOT}/perls/${PERL_VERSION} build/perl5
+	# rename module dir from e.g. "lib/5.30.3/" to "lib/provided_version/"
+	# this allows stable module paths in the cgi scripts
+	find build/perl5 -depth -type d -name '*${PERL_VERSION_MODULE_DIR}*' \
+	    -execdir bash -c 'mv "$$1" "$${1/${PERL_VERSION_MODULE_DIR}/provided_version}"' -- {} \;
 
 container:
 	docker build -t myfavoritethings-test . 
