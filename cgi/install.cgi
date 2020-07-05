@@ -1,7 +1,11 @@
-#!/usr/local/apache2/cgi-bin/MyFavoriteThings/perl5/bin/perl -w
+#!/bin/sh
+#! -*-perl-*-
+# run with the provided perl interpreter.
+# some magic inspired from 'perldoc perlrun'
+eval 'exec $(realpath ../perl5/bin/perl) -w -x $0'
+    if 0;
 
-####!/usr/bin/perl -w
-# TODO how to inject perl path and lib path (PERL5LIB is not an option)
+# TODO how to inject lib path (PERL5LIB is not an option)
 
 use strict;
 
