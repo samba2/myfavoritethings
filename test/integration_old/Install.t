@@ -50,6 +50,7 @@ sub installTest {
 	);
 	$mech->content_contains("contains invalid characters");
 
+	# TODO in standalone container
 	# create tmp dir
 	system("mkdir -p $documentRoot/$forwardDir");
 	$mech->submit_form_ok(

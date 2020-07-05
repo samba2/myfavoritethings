@@ -36,7 +36,9 @@ container:
 
 # https://metacpan.org/pod/Test::Class
 test:
-	test/installer_test.sh
+	cd test && \
+	perl Runner.t
+	# test/installer_test.sh
 
 clean:
 	sudo rm -rf build
