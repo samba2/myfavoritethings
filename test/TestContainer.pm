@@ -1,5 +1,8 @@
 package TestContainer;
 
+use Text::Trim;
+
+use strict;
 use v5.10;
 
 sub new {
@@ -8,7 +11,7 @@ sub new {
 }
 
 sub start {
-    shift->{container_id} = `docker run --publish 80:80 --detach --rm myfavoritethings-test`;
+    shift->{container_id} = trim(`docker run --publish 80:80 --detach --rm myfavoritethings-test`);
 }
 
 sub stop {
@@ -18,7 +21,7 @@ sub stop {
 
 sub is_healty {
     my $container_id = shift->{container_id};
-    chomp (my $container_status = `docker inspect --format='{{json .State.Health.Status}}' $container_id`);
+    my $container_status = trim(`docker inspect --format='{{json .State.Health.Status}}' $container_id`);
     return $container_status eq '"healthy"';
 }
 
@@ -32,6 +35,13 @@ sub block_until_available {
         sleep 1;
     }
     print "\n";
+}
+
+sub execute() {
+    my $self = shift;
+    my $cmd = shift;
+    my $container_id = $self->{container_id};
+    return trim(`docker exec $container_id $cmd`);
 }
 
 1;

@@ -12,3 +12,4 @@ requires 'CGI::Application::Plugin::RateLimit';
 requires 'Number::Bytes::Human';
 requires 'File::Copy::Recursive';
 requires 'Exception::Class';
+requires 'Text::Trim';

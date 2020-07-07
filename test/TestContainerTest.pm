@@ -2,6 +2,7 @@ package TestContainerTest;
 use base qw(Test::Class);
 use Test::More;
 
+use Text::Trim;
 use TestContainer;
 
 use v5.10;
@@ -16,6 +17,18 @@ sub starts_and_stops_container: Test {
 
     my $remaining_containers = `docker ps -q`;
     is($remaining_containers, "", "No container left over");
+}
+
+
+sub can_execute_a_system_command: Test {
+    my $c = TestContainer->new();
+    $c->start();
+    $c->block_until_available();
+
+    my $result = $c->execute("whoami");
+    is( $result, "root", "running as root");
+
+    $c->stop();
 }
 
 1;
