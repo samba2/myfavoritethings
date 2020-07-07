@@ -37,6 +37,14 @@ sub block_until_available {
     print "\n";
 }
 
+# convinience method
+sub start_and_block_until_available {
+    my $c = TestContainer->new();
+    $c->start();
+    $c->block_until_available();
+    return $c;
+}
+
 sub execute() {
     my $self = shift;
     my $cmd = shift;

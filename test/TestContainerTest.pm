@@ -19,6 +19,13 @@ sub starts_and_stops_container: Test {
     is($remaining_containers, "", "No container left over");
 }
 
+sub provides_quick_start: Test {
+    my $c = TestContainer->start_and_block_until_available();
+    $c->stop();
+    
+    ok(1, "quickstart works");
+}
+
 
 sub can_execute_a_system_command: Test {
     my $c = TestContainer->new();
