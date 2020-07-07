@@ -9,16 +9,12 @@ use v5.10;
 
 sub startup : Test(startup) {
     $self = shift;
-    my $container_id = TestContainer->new();
-    $container_id->start();
-    $container_id->block_until_available();
-    $self->{container_id} = $container_id;
+    $self->{test_container} = TestContainer::start_and_block_until_available();
     $self->{mech} = Test::WWW::Mechanize->new;
-
 }
  
 sub shutdown : Test(shutdown) {
-    shift->{container_id}->stop();
+    shift->{test_container}->stop();
 }
 
 sub test_0010_shows_welcome_message: Test {
@@ -116,23 +112,71 @@ sub test_0080_contains_invalid_characters: Test {
 	$mech->content_contains("contains invalid characters");
 }
 
-sub test_0090_all_good: Test {
-    my $mech = shift->{mech};
-    return "TODO fix this";
-    
+sub test_0100_forward_dir_already_exists: Test {
+	my $self = shift;
+    my $mech = $self->{mech};
+	my $test_container = $self->{test_container};
+
+	$test_container->execute("mkdir -p /usr/local/apache2/htdocs/DigitalDownload/promo");
+	
 	$mech->submit_form_ok(
 		{
 			fields => {
 				newPassword1 => "12345678",
 				newPassword2 => "12345678",
-				forwarderDir => "DigitalDownload/promo",
-				cssDir       => "myfavCss"
+				forwarderDir => "DigitalDownload/promo"
 			}
 		},
-		"everything fine"
+		"forward dir exists"
 	);
 
-	$mech->content_contains("Please enter your login password");
+	$mech->content_contains("The central web directory");
+	$test_container->execute("rm -rf /usr/local/apache2/htdocs/DigitalDownload/");
+}
+
+sub test_0110_css_dir_already_exists: Test {
+	my $self = shift;
+    my $mech = $self->{mech};
+	my $test_container = $self->{test_container};
+
+	$test_container->execute("mkdir -p /usr/local/apache2/htdocs/MYFAVCSS");
+	$mech->submit_form_ok(
+		{
+			fields => {
+				newPassword1 => "12345678",
+				newPassword2 => "12345678",
+				forwarderDir => "download",
+				cssDir       => "MYFAVCSS"
+			}
+		},
+		"css dir exists"
+	);
+	$mech->content_contains("The style sheet directory");
+	$test_container->execute("rmdir /usr/local/apache2/htdocs/MYFAVCSS");
+}
+
+sub test_0120_css_dir_has_no_write_permission: Test {
+	my $self = shift;
+    my $mech = $self->{mech};
+	my $test_container = $self->{test_container};
+
+	my $old_permissions = $test_container->execute("stat -c '%a' /usr/local/apache2/htdocs");
+	$test_container->execute("chmod 500 /usr/local/apache2/htdocs");
+	
+	$mech->submit_form_ok(
+		{
+			fields => {
+				newPassword1 => "12345678",
+				newPassword2 => "12345678",
+				forwarderDir => "download",
+				cssDir       => "MYFAVCSS"
+			}
+		},
+        "no css copy exception"
+    );
+    $mech->content_contains("Couldn't copy the css-files");
+	
+	$test_container->execute("chmod $old_permissions /usr/local/apache2/htdocs");
 }
 
 1;

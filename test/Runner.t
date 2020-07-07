@@ -2,7 +2,8 @@
 use FindBin 1.51 qw( $RealBin );
 use lib $RealBin;
 
-# use TestContainerTest;
+use TestContainerTest;
 use InstallTest;
+use InstallOkTest;
  
 Test::Class->runtests;

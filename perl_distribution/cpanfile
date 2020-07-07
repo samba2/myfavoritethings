@@ -1,5 +1,5 @@
 requires 'CGI::Carp';
-requires 'DBI';
+requires 'DBI', '== 1.622';
 requires 'DBD::AnyData';
 requires 'Data::Dumper';
 requires 'String::Random';
@@ -12,4 +12,7 @@ requires 'CGI::Application::Plugin::RateLimit';
 requires 'Number::Bytes::Human';
 requires 'File::Copy::Recursive';
 requires 'Exception::Class';
+requires 'PDF::Create';
+
+# test
 requires 'Text::Trim';
