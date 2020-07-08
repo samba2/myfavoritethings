@@ -1,6 +1,6 @@
 requires 'CGI::Carp';
 requires 'DBI', '== 1.622';
-requires 'DBD::AnyData';
+requires 'DBD::AnyData', '== 0.110';
 requires 'Data::Dumper';
 requires 'String::Random';
 requires 'URI::Escape';

@@ -30,11 +30,15 @@ perl_distribution: perl_distribution_build_image
 	# this allows stable module paths in the cgi scripts
 	find build/perl5 -depth -type d -name '*${PERL_VERSION_MODULE_DIR}*' \
 	    -execdir bash -c 'mv "$$1" "$${1/${PERL_VERSION_MODULE_DIR}/provided_version}"' -- {} \;
+	
+	# make module work with DBD::AnyData
+	patch `find build/perl5/ -wholename "*/CGI/Application/Plugin/RateLimit.pm"` perl_distribution/CGI_Application_Plugin_RateLimit.patch		
 
 container:
 	docker build -t myfavoritethings-test . 
 
 # https://metacpan.org/pod/Test::Class
+# TODO run inside controller container: https://fredrikaverpil.github.io/2018/12/14/control-docker-containers-from-within-container/
 test:
 	cd test && \
 	perl Runner.t

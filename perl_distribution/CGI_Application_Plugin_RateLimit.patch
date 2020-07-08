@@ -1,0 +1,32 @@
+# had to adapt module to get it running with dbd::anydata
+# the following SQL access methods where changed:
+# record_hit_sth, check_violation_sth, revoke_hit_sth
+# changed "$dbh->quote_identifier($self->table)" to "$self->table" 
+--- /tmp/RateLimit.pm	2020-07-08 21:31:31.056428428 +0000
++++ ./lib/site_perl/provided_version/CGI/Application/Plugin/RateLimit.pm	2020-07-08 21:33:58.129921989 +0000
+@@ -234,7 +234,7 @@
+     my ($self, $dbh) = @_;
+ 
+     return $dbh->prepare_cached('INSERT INTO '
+-                            . $dbh->quote_identifier($self->table)
++                            . $self->table
+                             . ' (user_id, action, timestamp) VALUES (?,?,?)');
+ }
+ 
+@@ -242,7 +242,7 @@
+     my ($self, $dbh) = @_;
+ 
+     return $dbh->prepare_cached('SELECT COUNT(*) FROM '
+-                     . $dbh->quote_identifier($self->table)
++                     . $self->table
+                      . ' WHERE user_id = ? AND action = ? AND timestamp > ?');
+ }
+ 
+@@ -250,7 +250,7 @@
+     my ($self, $dbh) = @_;
+ 
+     return $dbh->prepare_cached('DELETE FROM '
+-                     . $dbh->quote_identifier($self->table)
++                     . $self->table
+                      . ' WHERE user_id = ? AND action = ? AND timestamp = ?');
+ }
