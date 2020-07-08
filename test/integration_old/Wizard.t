@@ -43,6 +43,9 @@ sub testWizardAndLogin {
 	$mech->submit_form_ok( { fields => { loginPassword => "$currentPw" } },
 		"send correct login" );
 
+
+	## TODO continue from herr
+
 	# test Wizard.pm
 	createRelease( "myfavTestId",  "myfavTestName",  "maik.zip" );
 	createRelease( "secondTestId", "secondTestName", "maik2.zip" );
