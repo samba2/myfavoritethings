@@ -7,7 +7,10 @@ use v5.10;
 
 sub new {
     my $class = shift;
-    bless {}, $class;
+	my (%params) = @_;
+
+	bless {%params}, $class;
+
 }
 
 sub start {
@@ -15,7 +18,13 @@ sub start {
 }
 
 sub stop {
-    my $container_id = shift->{container_id};
+    my $self = shift;
+    my $container_id = $self->{container_id};
+
+    if ($self->{debug}) {
+        system("docker logs $container_id");    
+    }
+
     system("docker rm -f $container_id");
 }
 
@@ -39,7 +48,9 @@ sub block_until_available {
 
 # convinience method
 sub start_and_block_until_available {
-    my $c = TestContainer->new();
+    my $debug = shift;
+
+    my $c = TestContainer->new('debug' => $debug);
     $c->start();
     $c->block_until_available();
     return $c;

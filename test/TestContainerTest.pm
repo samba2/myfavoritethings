@@ -8,7 +8,7 @@ use TestContainer;
 use v5.10;
 
 sub starts_and_stops_container: Test {
-    my $c = TestContainer->new();
+    my $c = TestContainer->new('debug' => true);
     isa_ok($c, 'TestContainer');
 
     $c->start();
