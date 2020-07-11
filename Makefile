@@ -2,6 +2,9 @@ PERL_VERSION=perl-5.30.3
 PERL_VERSION_MODULE_DIR=5.30.3
 
 PERLBREW_ROOT=${PWD}/build/perlbrew
+# has to be in test dir, otherwise the fileupload test does not work?!
+201MB_ZIP=${PWD}/test/201MB.zip
+
 
 perl_distribution_build_image:
 	cd perl_distribution && \
@@ -34,17 +37,21 @@ perl_distribution: perl_distribution_build_image
 	# make module work with DBD::AnyData
 	patch `find build/perl5/ -wholename "*/CGI/Application/Plugin/RateLimit.pm"` perl_distribution/CGI_Application_Plugin_RateLimit.patch		
 
+${201MB_ZIP}:
+	fallocate --length 201M ${201MB_ZIP}
+
 container:
 	docker build -t myfavoritethings-test . 
 
 # https://metacpan.org/pod/Test::Class
 # TODO run inside controller container: https://fredrikaverpil.github.io/2018/12/14/control-docker-containers-from-within-container/
-test:
+test: ${201MB_ZIP}
 	cd test && \
 	perl Runner.t
 	# test/installer_test.sh
 
 clean:
 	sudo rm -rf build
+	rm -f ${201MB_ZIP}
 
 .PHONY: test container perl_distribution

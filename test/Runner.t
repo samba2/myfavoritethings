@@ -6,5 +6,6 @@ use TestContainerTest;
 use InstallTest;
 use InstallOkTest;
 use LoginTest;
+use WizardTest;
  
 Test::Class->runtests;
