@@ -8,5 +8,6 @@ use InstallOkTest;
 use LoginTest;
 use WizardTest;
 use ReleasesTest;
+use DownloadFileTest;
 
 Test::Class->runtests;
