@@ -25,7 +25,7 @@ sub stop {
         system("docker logs $container_id");    
     }
 
-    system("docker rm -f $container_id");
+    system("docker rm -f $container_id >/dev/null");
 }
 
 sub is_healty {
