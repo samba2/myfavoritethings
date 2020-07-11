@@ -3,12 +3,13 @@ use base qw(Test::Class);
 use Test::More;
 use Test::WWW::Mechanize;
 
+use strict;
 use TestContainer;
 
 use v5.10;
 
 sub startup : Test(startup) {
-    $self = shift;
+    my $self = shift;
     $self->{test_container} = TestContainer::start_and_block_until_available();
     $self->{mech} = Test::WWW::Mechanize->new;
 }
@@ -19,9 +20,7 @@ sub shutdown : Test(shutdown) {
 
 sub test_0010_shows_welcome_message: Tests {
     my $mech = shift->{mech};
-
-    $cgi_bin_url = "http://localhost/cgi-bin/MyFavoriteThings/cgi";
-	$mech->get_ok("$cgi_bin_url/install.cgi");
+	$mech->get_ok("http://localhost/cgi-bin/MyFavoriteThings/cgi/install.cgi");
 	$mech->content_contains("Welcome to the 'My Favorite Things' Installer");
 }
 

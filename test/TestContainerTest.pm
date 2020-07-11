@@ -5,10 +5,11 @@ use Test::More;
 use Text::Trim;
 use TestContainer;
 
+use strict;
 use v5.10;
 
 sub starts_and_stops_container: Tests {
-    my $c = TestContainer->new('debug' => true);
+    my $c = TestContainer->new();
     isa_ok($c, 'TestContainer');
 
     $c->start();

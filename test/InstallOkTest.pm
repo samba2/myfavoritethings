@@ -5,15 +5,14 @@ use Test::WWW::Mechanize;
 
 use TestContainer;
 
+use strict;
 use v5.10;
 
 sub all_good: Tests {
     my $test_container = TestContainer::start_and_block_until_available();
     my $mech = Test::WWW::Mechanize->new;
     
-    $cgi_bin_url = "http://localhost/cgi-bin/MyFavoriteThings/cgi";
-	$mech->get_ok("$cgi_bin_url/install.cgi");
-
+	$mech->get_ok("http://localhost/cgi-bin/MyFavoriteThings/cgi/install.cgi");
 	$mech->submit_form_ok(
 		{
 			fields => {

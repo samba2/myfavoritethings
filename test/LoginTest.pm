@@ -5,30 +5,25 @@ use Test::WWW::Mechanize;
 
 use TestContainer;
 
+use strict;
 use v5.10;
 
 
 sub setup : Test(setup) {
-    $self = shift;
+    my $self = shift;
     $self->{test_container} = TestContainer::start_and_block_until_available();
-    $mech = Test::WWW::Mechanize->new;
+    my $mech = Test::WWW::Mechanize->new;
     $self->{mech} = $mech;
 
     # install
-    $cgi_bin_url = "http://localhost/cgi-bin/MyFavoriteThings/cgi";
-	$mech->get_ok("$cgi_bin_url/install.cgi");
-
-	$mech->submit_form_ok(
-		{
+	$mech->get_ok("http://localhost/cgi-bin/MyFavoriteThings/cgi/install.cgi");
+	$mech->submit_form(
 			fields => {
 				newPassword1 => "12345678",
 				newPassword2 => "12345678",
 				forwarderDir => "DigitalDownload/promo",
 				cssDir       => "myfavCss"
-			}
-		},
-		"everything setup"
-	);
+			});
 
 	$mech->content_contains("Please enter your login password");
 }
@@ -52,7 +47,7 @@ sub test_0020_rate_limiter_kicks_in: Tests {
     my $mech = shift->{mech};
     my $rateLimterMax = 30;  # this is the default config
 
-	for ($i=0; $i<=$rateLimterMax; $i++) {
+	for (my $i=0; $i<=$rateLimterMax; $i++) {
 		$mech->submit_form_ok( { fields => { loginPassword => "wrong login" } },
 			"send wrong login" );
 	}
