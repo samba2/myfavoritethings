@@ -7,5 +7,6 @@ use InstallTest;
 use InstallOkTest;
 use LoginTest;
 use WizardTest;
- 
+use ReleasesTest;
+
 Test::Class->runtests;

@@ -37,7 +37,7 @@ sub is_healty {
 
 sub block_until_available {
     my $self = shift;
-    print "Waiting for testcontainer to become healthy";
+    print "Waiting for testcontainer to become ready";
 
     while (! $self->is_healty()) {
         print ".";
