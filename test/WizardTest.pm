@@ -35,7 +35,7 @@ sub teardown : Test(teardown) {
 }
 
 
-sub create_new_release_journey: Test {
+sub create_new_release_journey: Tests {
     my $mech = shift->{mech};
     my $test_container = $self->{test_container};
 

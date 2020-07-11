@@ -7,7 +7,7 @@ use TestContainer;
 
 use v5.10;
 
-sub all_good: Test {
+sub all_good: Tests {
     my $test_container = TestContainer::start_and_block_until_available();
     my $mech = Test::WWW::Mechanize->new;
     

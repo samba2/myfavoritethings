@@ -7,7 +7,7 @@ use TestContainer;
 
 use v5.10;
 
-sub starts_and_stops_container: Test {
+sub starts_and_stops_container: Tests {
     my $c = TestContainer->new('debug' => true);
     isa_ok($c, 'TestContainer');
 
@@ -19,7 +19,7 @@ sub starts_and_stops_container: Test {
     is($remaining_containers, "", "No container left over");
 }
 
-sub provides_quick_start: Test {
+sub provides_quick_start: Tests {
     my $c = TestContainer->start_and_block_until_available();
     $c->stop();
     
@@ -27,7 +27,7 @@ sub provides_quick_start: Test {
 }
 
 
-sub can_execute_a_system_command: Test {
+sub can_execute_a_system_command: Tests {
     my $c = TestContainer->new();
     $c->start();
     $c->block_until_available();

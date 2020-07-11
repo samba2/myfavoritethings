@@ -17,7 +17,7 @@ sub shutdown : Test(shutdown) {
     shift->{test_container}->stop();
 }
 
-sub test_0010_shows_welcome_message: Test {
+sub test_0010_shows_welcome_message: Tests {
     my $mech = shift->{mech};
 
     $cgi_bin_url = "http://localhost/cgi-bin/MyFavoriteThings/cgi";
@@ -25,20 +25,20 @@ sub test_0010_shows_welcome_message: Test {
 	$mech->content_contains("Welcome to the 'My Favorite Things' Installer");
 }
 
-sub test_0020_entering_password_is_enforced: Test {
+sub test_0020_entering_password_is_enforced: Tests {
     my $mech = shift->{mech};
     $mech->submit_form_ok( {} );
 	$mech->content_contains("You have to fill out all password fields.");
 }
 
-sub test_0030_one_password_field_missing: Test {
+sub test_0030_one_password_field_missing: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok( { fields => { newPassword1 => "1234" } },
 		"leave one empty" );
 	$mech->content_contains("You have to fill out all password fields.");
 }
 
-sub test_0040_password_too_short: Test {
+sub test_0040_password_too_short: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
 		{ fields => { newPassword1 => "1234", newPassword2 => "1234" } },
@@ -46,7 +46,7 @@ sub test_0040_password_too_short: Test {
 	$mech->content_contains("needs to be at least");
 }
 
-sub test_0050_password_too_long: Test {
+sub test_0050_password_too_long: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
 		{
@@ -60,7 +60,7 @@ sub test_0050_password_too_long: Test {
 	$mech->content_contains("characters at maximum");
 }
 
-sub test_0060_no_whitespace_in_password: Test {
+sub test_0060_no_whitespace_in_password: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
 		{
@@ -72,7 +72,7 @@ sub test_0060_no_whitespace_in_password: Test {
 	$mech->content_contains("not allowed to contain whitespaces.");
 }
 
-sub test_0070_passwords_not_identical: Test {
+sub test_0070_passwords_not_identical: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
 		{
@@ -86,7 +86,7 @@ sub test_0070_passwords_not_identical: Test {
 	$mech->content_contains("password was not entered two times identical");
 }
 
-sub test_0080_contains_invalid_characters: Test {
+sub test_0080_contains_invalid_characters: Tests {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
 		{
@@ -100,7 +100,7 @@ sub test_0080_contains_invalid_characters: Test {
 	$mech->content_contains("contains invalid characters");
 }
 
-sub test_0100_forward_dir_already_exists: Test {
+sub test_0100_forward_dir_already_exists: Tests {
 	my $self = shift;
     my $mech = $self->{mech};
 	my $test_container = $self->{test_container};
@@ -122,7 +122,7 @@ sub test_0100_forward_dir_already_exists: Test {
 	$test_container->execute("rm -rf /usr/local/apache2/htdocs/DigitalDownload/");
 }
 
-sub test_0110_css_dir_already_exists: Test {
+sub test_0110_css_dir_already_exists: Tests {
 	my $self = shift;
     my $mech = $self->{mech};
 	my $test_container = $self->{test_container};
@@ -143,7 +143,7 @@ sub test_0110_css_dir_already_exists: Test {
 	$test_container->execute("rmdir /usr/local/apache2/htdocs/MYFAVCSS");
 }
 
-sub test_0120_css_dir_has_no_write_permission: Test {
+sub test_0120_css_dir_has_no_write_permission: Tests {
 	my $self = shift;
     my $mech = $self->{mech};
 	my $test_container = $self->{test_container};

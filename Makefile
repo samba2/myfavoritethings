@@ -48,7 +48,6 @@ container:
 test: ${201MB_ZIP}
 	cd test && \
 	perl Runner.t
-	# test/installer_test.sh
 
 clean:
 	sudo rm -rf build

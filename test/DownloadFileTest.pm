@@ -42,7 +42,7 @@ sub shutdown : Test(shutdown) {
     shift->{test_container}->stop();
 }
 
-sub test_0010_check_basic_call: Test {
+sub test_0010_check_basic_call: Tests {
     my $mech = shift->{mech};
 
 	$mech->get_ok("http://localhost/cgi-bin/MyFavoriteThings/cgi/DownloadFile.cgi", "call without parameters");
@@ -55,7 +55,7 @@ sub test_0010_check_basic_call: Test {
 	$mech->content_contains("This download service is provided by");
 }
 
-sub test_0020_code_can_be_entered_when_called_with_correct_release_hash: Test {
+sub test_0020_code_can_be_entered_when_called_with_correct_release_hash: Tests {
     my $mech = shift->{mech};
 
 	$mech->get_ok("http://localhost/DigitalDownload/promo/RELEASE001/");
@@ -63,7 +63,7 @@ sub test_0020_code_can_be_entered_when_called_with_correct_release_hash: Test {
 	$mech->content_contains("Please enter the download code");
 }
 
-sub test_0030_enter_invalid_code: Test {
+sub test_0030_enter_invalid_code: Tests {
     my $mech = shift->{mech};
 
 	$mech->get("http://localhost/DigitalDownload/promo/RELEASE001/");
@@ -74,7 +74,7 @@ sub test_0030_enter_invalid_code: Test {
 	$mech->content_contains("The code you have entered is not valid.");
 }
 
-sub test_0040_rate_limit: Test {
+sub test_0040_rate_limit: Tests {
     my $self = shift;
     my $mech = $self->{mech};
     my $test_container = $self->{test_container};
@@ -97,7 +97,7 @@ sub test_0040_rate_limit: Test {
     $test_container->execute("rm -f /usr/local/apache2/cgi-bin/MyFavoriteThings/data/rate_limit_hits.csv");
 }
 
-sub test_0050_code_is_valid: Test {
+sub test_0050_code_is_valid: Tests {
     my $self = shift;
     my $mech = $self->{mech};
     my $test_container = $self->{test_container};
@@ -123,7 +123,7 @@ sub test_0050_code_is_valid: Test {
 	$mech->content_contains("Thanks for your purchase");
 }
 
-sub test_0060_code_has_expired: Test {
+sub test_0060_code_has_expired: Tests {
     my $self = shift;
     my $mech = $self->{mech};
     my $test_container = $self->{test_container};

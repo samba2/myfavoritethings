@@ -38,7 +38,7 @@ sub teardown : Test(teardown) {
 }
 
 
-sub test_0010_wrong_login: Test {
+sub test_0010_wrong_login: Tests {
     my $mech = shift->{mech};
 
 	$mech->content_contains("enter your login password");
@@ -48,7 +48,7 @@ sub test_0010_wrong_login: Test {
 }
 
 
-sub test_0020_rate_limiter_kicks_in: Test {
+sub test_0020_rate_limiter_kicks_in: Tests {
     my $mech = shift->{mech};
     my $rateLimterMax = 30;  # this is the default config
 
@@ -61,7 +61,7 @@ sub test_0020_rate_limiter_kicks_in: Test {
 	$mech->content_contains("accessed this page too often");
 }
 
-sub test_0030_too_long_password: Test {
+sub test_0030_too_long_password: Tests {
     my $mech = shift->{mech};
 
 	$mech->submit_form_ok(
@@ -70,7 +70,7 @@ sub test_0030_too_long_password: Test {
 	$mech->content_contains("too long");
 }
 
-sub test_0040_login_ok: Test {
+sub test_0040_login_ok: Tests {
     my $mech = shift->{mech};
 
 	$mech->submit_form_ok(

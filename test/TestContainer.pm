@@ -1,6 +1,7 @@
 package TestContainer;
 
 use Text::Trim;
+use Time::HiRes qw/sleep/;
 
 use strict;
 use v5.10;
@@ -41,7 +42,7 @@ sub block_until_available {
 
     while (! $self->is_healty()) {
         print ".";
-        sleep 1;
+        sleep 0.5;
     }
     print "\n";
 }

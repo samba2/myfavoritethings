@@ -47,7 +47,7 @@ sub shutdown : Test(shutdown) {
 }
 
 
-sub test_0010_no_release_details_are_displayed: Test {
+sub test_0010_no_release_details_are_displayed: Tests {
     my $mech = shift->{mech};
 
 	$mech->get("http://localhost/cgi-bin/MyFavoriteThings/cgi/Releases.cgi");
@@ -57,19 +57,19 @@ sub test_0010_no_release_details_are_displayed: Test {
 	$mech->content_unlike( qr/Release Name/ );
 }
 
-sub test_0020_no_release_details_when_called_with_wrong_parameter: Test {
+sub test_0020_no_release_details_when_called_with_wrong_parameter: Tests {
     my $mech = shift->{mech};
 	$mech->get("http://localhost/cgi-bin/MyFavoriteThings/cgi/Releases.cgi?blu=bla");
 	$mech->content_unlike( qr/Release Name/ );
 }
 
-sub test_0030_call_with_wrong_release_id_si_ignored: Test {
+sub test_0030_call_with_wrong_release_id_si_ignored: Tests {
     my $mech = shift->{mech};
 	$mech->get("http://localhost/cgi-bin/MyFavoriteThings/cgi/Releases.cgi?releaseId=notexisting");
 	$mech->content_unlike( qr/Release Name/ );
 }
 
-sub test_0040_existing_release_can_be_selected: Test {
+sub test_0040_existing_release_can_be_selected: Tests {
     my $mech = shift->{mech};
 	$mech->get("http://localhost/cgi-bin/MyFavoriteThings/cgi/Releases.cgi?releaseId=RELEASE001");
 	$mech->content_contains("Select a release");
@@ -77,7 +77,7 @@ sub test_0040_existing_release_can_be_selected: Test {
 	$mech->content_contains("../upload_files/goodmusic.zip");
 }
 
-sub test_0050_use_menu: Test {
+sub test_0050_use_menu: Tests {
     my $mech = shift->{mech};
 	$mech->get("http://localhost/cgi-bin/MyFavoriteThings/cgi/Releases.cgi");
   	$mech->follow_link_ok({text => "Manage Releases"}, "open releases" );
@@ -89,7 +89,7 @@ sub test_0050_use_menu: Test {
 	$mech->content_contains("../upload_files/goodmusic.zip");
 }
 
-sub test_0060_no_download_code_reset_when_not_used: Test {
+sub test_0060_no_download_code_reset_when_not_used: Tests {
     my $self = shift;
     my $mech = $self->{mech};
     my $test_container = $self->{test_container};
@@ -110,7 +110,7 @@ sub test_0060_no_download_code_reset_when_not_used: Test {
 	$mech->content_contains("has been not requested so far");	
 }
 
-sub test_0070_reset_download_code: Test {
+sub test_0070_reset_download_code: Tests {
     my $self = shift;
     my $mech = $self->{mech};
     my $test_container = $self->{test_container};
@@ -132,7 +132,7 @@ sub test_0070_reset_download_code: Test {
 
 }
 
-sub test_0080_csv_export: Test {
+sub test_0080_csv_export: Tests {
     my $self = shift;
     my $mech = $self->{mech};
 
@@ -145,7 +145,7 @@ sub test_0080_csv_export: Test {
 	$mech->content_contains(",used,,,,", "found a used collumn");
 }
 
-sub test_0090_pdf_export: Test {
+sub test_0090_pdf_export: Tests {
     my $self = shift;
     my $mech = $self->{mech};
 
@@ -158,7 +158,7 @@ sub test_0090_pdf_export: Test {
 	$mech->content_contains("Download powered", "found some pdf content");
 }
 		
-sub test_0100_delete_release: Test {
+sub test_0100_delete_release: Tests {
     my $self = shift;
     my $mech = $self->{mech};
 
@@ -172,7 +172,7 @@ sub test_0100_delete_release: Test {
 	$mech->content_contains("Release 'AN_AWESOME_RELEASE' has been successfully deleted");
 }
 		
-sub test_0110_change_password: Test {
+sub test_0110_change_password: Tests {
     my $self = shift;
     my $mech = $self->{mech};
 
