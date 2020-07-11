@@ -14,7 +14,8 @@ use Exception::Class('MyFav::Install::ChmodFailed',
                      'MyFav::Install::CssNotAccessible',
                      'MyFav::Install::CantCreateForwarderPath',
                      'MyFav::Install::NoAccessToForwarderUrl',
-                     'MyFav::Install::NoWriteInForwarderPath'
+                     'MyFav::Install::NoWriteInForwarderPath',
+                     'MyFav::Install::InstallationError',
                      );
 
 use base 'MyFav::Base';
@@ -29,6 +30,8 @@ my %forwardDirSuggestions = (
 	6 => "myfav",
 	7 => "qayx"
 );
+
+my $uploadDir = "../upload_files";
 
 
 # overwrite method from MyFav::Base
@@ -154,6 +157,9 @@ sub runModeProcessInstall {
 
             # create .htaccess file to prevent listing of dirs inside $forwarderPath via browser
             $self->writeHtaccessFile("$forwarderPath/.htaccess");	
+
+			mkpath($uploadDir) or MyFav::Install::InstallationError->throw( error=>$! );
+
 		};
 
         my $e = Exception::Class->caught();  
