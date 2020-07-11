@@ -1,18 +1,20 @@
-requires 'CGI::Carp';
+requires 'CGI::Carp', '== 4.50';
 requires 'DBI', '== 1.622';
 requires 'DBD::AnyData', '== 0.110';
-requires 'Data::Dumper';
-requires 'String::Random';
-requires 'URI::Escape';
-requires 'Date::Format';
-requires 'HTTP::Lite';
-requires 'CGI::Application::Plugin::Session';
-requires 'CGI::Application::Plugin::Redirect';
-requires 'CGI::Application::Plugin::RateLimit';
-requires 'Number::Bytes::Human';
-requires 'File::Copy::Recursive';
-requires 'Exception::Class';
-requires 'PDF::Create';
+requires 'Data::Dumper', '== 2.174';
+requires 'String::Random', '== 0.30';
+requires 'URI::Escape', '== 3.31';
+requires 'Date::Format', '== 2.24';
+requires 'HTTP::Lite', '== 2.44';
+requires 'CGI::Application::Plugin::Session', '== 1.05';
+requires 'CGI::Application::Plugin::Redirect', '== 1.00';
+requires 'CGI::Application::Plugin::RateLimit', '== 1.0';
+requires 'Number::Bytes::Human', '== 0.11';
+requires 'File::Copy::Recursive', '== 0.45';
+requires 'Exception::Class', '== 1.44';
+requires 'PDF::Create', '== 1.46';
 
 # test
-requires 'Text::Trim';
+requires 'Text::Trim', '== 1.03';
+requires 'Test::Class', '== 0.50';
+requires 'Test::WWW::Mechanize', '== 1.52';
