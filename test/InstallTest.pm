@@ -72,18 +72,6 @@ sub test_0060_no_whitespace_in_password: Test {
 	$mech->content_contains("not allowed to contain whitespaces.");
 }
 
-sub test_0060_no_whitespace_in_password: Test {
-    my $mech = shift->{mech};
-	$mech->submit_form_ok(
-		{
-			fields =>
-			  { newPassword1 => "white space", newPassword2 => "white space" }
-		},
-		"white space"
-	);
-	$mech->content_contains("not allowed to contain whitespaces.");
-}
-
 sub test_0070_passwords_not_identical: Test {
     my $mech = shift->{mech};
 	$mech->submit_form_ok(
