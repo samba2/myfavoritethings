@@ -3,6 +3,10 @@ PERL_VERSION_MODULE_DIR=5.30.3
 
 PERLBREW_ROOT=${PWD}/build/perlbrew
 
+# heading in green
+define log_heading
+    echo "\n\e[32m-= $(1) =-\n\e[0m"
+endef
 
 perl_distribution_build_image:
 	cd perl_distribution && \
@@ -39,11 +43,17 @@ perl_distribution: perl_distribution_build_image
 container:
 	docker build -t myfavoritethings-test . 
 
+test: build_test_runner execute_test_runner
+
+build_test_runner:
+	cd test && \
+	$(call log_heading, Building Test Runner Image) && \
+	docker build --tag myfav-test-runner .
+
 # runs tests inside the myfav-test-runner image.
 # due to --network='host' a Linux system is probably required
-test:
-	cd test && \
-	docker build --tag myfav-test-runner . && \
+execute_test_runner: 
+	$(call log_heading, Executing Test Runner) && \
 	docker run \
 		--network='host' \
 	    -v /var/run/docker.sock:/var/run/docker.sock \
@@ -52,5 +62,6 @@ test:
 
 clean:
 	sudo rm -rf build
+	docker rmi --force myfav-test-runner
 
 .PHONY: test container perl_distribution
