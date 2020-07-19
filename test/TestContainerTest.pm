@@ -16,8 +16,8 @@ sub starts_and_stops_container: Tests {
     $c->block_until_available();
     $c->stop();
 
-    my $remaining_containers = `docker ps -q`;
-    is($remaining_containers, "", "No container left over");
+    my $remaining_container = `docker ps -q --filter "id=$c->getContainerId()"`;
+    is($remaining_container, "", "No container left over");
 }
 
 sub provides_quick_start: Tests {

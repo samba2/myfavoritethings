@@ -15,7 +15,8 @@ sub new {
 }
 
 sub start {
-    shift->{container_id} = trim(`docker run --publish 80:80 --detach --rm myfavoritethings-test`);
+    my $self = shift;
+    $self->{container_id} = trim(`docker run --publish 80:80 --detach --rm myfavoritethings-test`);
 }
 
 sub stop {
@@ -62,6 +63,11 @@ sub execute() {
     my $cmd = shift;
     my $container_id = $self->{container_id};
     return trim(`docker exec $container_id $cmd`);
+}
+
+sub getContainerId() {
+    my $self = shift;
+    return $self->{container_id};
 }
 
 1;
