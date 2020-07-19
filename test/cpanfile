@@ -1,0 +1,3 @@
+requires 'Text::Trim', '== 1.03';
+requires 'Test::Class', '== 0.50';
+requires 'Test::WWW::Mechanize', '== 1.52';

@@ -13,8 +13,3 @@ requires 'Number::Bytes::Human', '== 0.11';
 requires 'File::Copy::Recursive', '== 0.45';
 requires 'Exception::Class', '== 1.44';
 requires 'PDF::Create', '== 1.46';
-
-# test
-requires 'Text::Trim', '== 1.03';
-requires 'Test::Class', '== 0.50';
-requires 'Test::WWW::Mechanize', '== 1.52';
