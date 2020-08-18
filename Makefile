@@ -15,11 +15,13 @@ myfav_perl_distribution_build_image:
 	docker build --tag myfav_perl_distribution_builder .
 
 # TODO we need this version homehow installed https://metacpan.org/source/OALDERS/URI-1.76/lib/URI/Escape.pm
+#  |
+#  +--> still relevant?
+# TODO continue here, use created perl_distribution to run tests
 myfav_perl_distribution_build_image2:
 	$(call log_heading, Building My Favourite Things Perl Distribution Image)
 	cd myfav_perl_distribution && \
 	docker build --build-arg PERL_VERSION=${PERL_VERSION} --build-arg PERL_VERSION_MODULE_DIR=${PERL_VERSION_MODULE_DIR} --tag myfav_perl_distribution_builder2 -f Dockerfile.new .
-
 
 # we build our own Perl distribution to ship it with My Favourite Things.
 # To work around issues on older server (too older glibc) we use an accient 
@@ -68,9 +70,13 @@ execute_test_runner:
 		-v /usr/bin/docker:/usr/bin/docker \
         myfav_test_runner
 
+# TODO check what images are still relevant
 clean:
 	sudo rm -rf build
+	docker rm $(shell docker ps -a -q) || true
+	docker rmi $(shell docker images -f "dangling=true" -q) || true 
 	docker rmi --force myfav_test_runner
 	docker rmi --force myfav_perl_distribution_builder
+	docker rmi --force myfav_perl_distribution_builder2
 
 .PHONY: test container myfav_perl_distribution
