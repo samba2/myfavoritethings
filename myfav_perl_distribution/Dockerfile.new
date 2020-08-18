@@ -1,0 +1,28 @@
+FROM ubuntu:14.04
+
+SHELL ["/bin/bash", "-c"]
+
+ARG PERL_VERSION
+RUN apt-get update; apt-get -y install build-essential curl
+
+RUN curl -L http://install.perlbrew.pl | bash
+
+RUN source ~/perl5/perlbrew/etc/bashrc && perlbrew -j 9 --notest install ${PERL_VERSION}
+RUN source ~/perl5/perlbrew/etc/bashrc && perlbrew install-cpanm
+
+COPY cpanfile /tmp/myfav/cpanfile
+COPY CGI_Application_Plugin_RateLimit.patch /tmp/myfav/CGI_Application_Plugin_RateLimit.patch
+
+WORKDIR /tmp/myfav
+RUN source ~/perl5/perlbrew/etc/bashrc && cpanm --notest --installdeps .
+
+RUN cp -r ~/perl5/perlbrew/perls/${PERL_VERSION} /tmp/myfav_perl_distribution
+# rename module dir from e.g. "lib/5.30.3/" to "lib/provided_version/"
+# this allows stable module paths in the cgi scripts
+# TODO move up
+ARG PERL_VERSION_MODULE_DIR
+RUN find /tmp/myfav_perl_distribution -type d -name "*${PERL_VERSION_MODULE_DIR}*" 
+
+# TODO continue here, debug inside container
+RUN find /tmp/myfav_perl_distribution -type d -name "*${PERL_VERSION_MODULE_DIR}*" \
+	    -execdir bash -c "mv "\$1" \"\${1/${PERL_VERSION_MODULE_DIR}/provided_version}\"" -- {} \;

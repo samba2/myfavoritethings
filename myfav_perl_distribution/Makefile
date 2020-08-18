@@ -8,7 +8,7 @@
 #                Has to be found by perlbrew. see 'perlbrew available'
 # PERLBREW_ROOT - root dir for perlbrew
 
-PERL_DISTRIBUTION_DIR=${PERLBREW_ROOT}/perls/${PERL_VERSION}
+myfav_perl_distribution_DIR=${PERLBREW_ROOT}/perls/${PERL_VERSION}
 PERLBREW=${PERLBREW_ROOT}/bin/perlbrew
 CPANM=${PERLBREW_ROOT}/bin/cpanm
 
@@ -21,11 +21,11 @@ ${PERLBREW}:
 ${CPANM}: ${PERLBREW}
 	${PERLBREW} install-cpanm
 
-${PERL_DISTRIBUTION_DIR}: ${PERLBREW}
+${myfav_perl_distribution_DIR}: ${PERLBREW}
 	${PERLBREW} -j 9 --notest install ${PERL_VERSION}
 
-install_modules: ${PERL_DISTRIBUTION_DIR} ${CPANM}
+install_modules: ${myfav_perl_distribution_DIR} ${CPANM}
 	${PERLBREW} exec -q --with ${PERL_VERSION} ${CPANM} --notest --installdeps .
 	${PERLBREW} exec -q --with ${PERL_VERSION} cpan -l
 	
-.PHONY: installdeps perl_distribution
+.PHONY: installdeps myfav_perl_distribution

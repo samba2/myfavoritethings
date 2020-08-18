@@ -12,7 +12,7 @@ BEGIN {push @INC ,
     '../perl5/lib/site_perl/provided_version/x86_64-linux/', 
     '../lib/'}
 
-use strict;
+# use strict;
 use MyFav::SubApps::Install;
 
 my $wizard = MyFav::SubApps::Install->new();
