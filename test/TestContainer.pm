@@ -6,6 +6,8 @@ use Time::HiRes qw/sleep/;
 use strict;
 use v5.10;
 
+my $MYFAV_DOCKER_IMAGE_NAME = "myfav";
+
 sub new {
     my $class = shift;
 	my (%params) = @_;
@@ -16,7 +18,7 @@ sub new {
 
 sub start {
     my $self = shift;
-    $self->{container_id} = trim(`docker run --publish 80:80 --detach --rm myfavoritethings-test`);
+    $self->{container_id} = trim(`docker run --publish 80:80 --detach --rm $MYFAV_DOCKER_IMAGE_NAME`);
 }
 
 sub stop {
