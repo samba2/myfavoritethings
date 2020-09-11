@@ -19,12 +19,12 @@ myfav_perl_distribution:
 # an image containing a freshly installed MyFav installation.
 # start manually via: docker run -p 80:80 -it myfav
 # access installer: http://localhost/cgi-bin/MyFavoriteThings/cgi/install.cgi 
-myfav:
+myfav: myfav_perl_distribution
 	$(call log_heading, Building My Favourite Things Image)
 	docker build --tag myfav --file test/Dockerfile.myfav .
 
 # build a test runner and then execute the integration tests.
-test: build_test_runner execute_test_runner
+test: myfav build_test_runner execute_test_runner
 
 build_test_runner:
 	$(call log_heading, Building Test Runner Image)
@@ -43,10 +43,21 @@ execute_test_runner:
         myfav_test_runner
 
 clean:
+	rm -rf release
 	docker rm $(shell docker ps -a -q) || true
 	docker rmi $(shell docker images -f "dangling=true" -q) || true 
 	docker rmi --force myfav
 	docker rmi --force myfav_test_runner
 	docker rmi --force myfav_perl_distribution
 
-.PHONY: test myfav_perl_distribution
+release: myfav
+	mkdir -p release
+	export ID=$$(docker create myfav:latest) && \
+	docker cp $$ID:/usr/local/apache2/cgi-bin/MyFavoriteThings/ release/ && \
+	docker rm -v $$ID
+	rm -rf release/MyFavoriteThings/data
+	cd release/MyFavoriteThings && \
+	zip -r ../release-VERSION_NUMBER.zip *
+
+
+.PHONY: test myfav_perl_distribution release
