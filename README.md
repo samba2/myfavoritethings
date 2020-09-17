@@ -40,6 +40,10 @@ After the update your new folder structure should now look something like this:
 * `data` (untouched!) 
 * `perl5` (new)
 
+! Now give *executable* permissions to the files in `cgi` and also to the Perl interpreter itself located at `perl5/bin/perl`.
+
+Note: For those who have customized the CSS and HTML over the years: The only changes for this update where done in the `lib`, `cgi` and `perl5` directories. You should also be fine to update only these and keep your custom content in `html` and/ or `css`.
+
 ## Update May 2015
 Moved to github.com since Google Code is closing down.
 
